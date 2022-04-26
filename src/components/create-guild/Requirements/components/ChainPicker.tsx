@@ -77,7 +77,7 @@ const ChainPicker = ({
                 )}
                 onChange={(selectedOption: SelectOption) => {
                   onChange(selectedOption?.value)
-                  onChangeHandler?.()
+                  if (selectedOption?.value !== value) onChangeHandler?.()
                 }}
                 onBlur={onBlur}
               />

@@ -25,7 +25,7 @@ const RPC = {
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000", // needed for proper form handling in the TokenFormCard component
+      address: null, // needed for proper form handling in the TokenFormCard component
       logoURI:
         "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
     },
@@ -40,7 +40,7 @@ const RPC = {
       name: "Binance Coin",
       symbol: "BNB",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/825/small/binance-coin-logo.png?1547034615",
     },
@@ -55,7 +55,7 @@ const RPC = {
       name: "Polygon",
       symbol: "MATIC",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912",
     },
@@ -70,7 +70,7 @@ const RPC = {
       name: "Avalanche",
       symbol: "AVAX",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/12559/small/coin-round-red.png?1604021818",
     },
@@ -85,7 +85,7 @@ const RPC = {
       name: "Gnosis",
       symbol: "Gnosis",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492",
     },
@@ -100,7 +100,7 @@ const RPC = {
       name: "Fantom",
       symbol: "FTM",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/4001/small/Fantom.png?1558015016",
     },
@@ -115,7 +115,7 @@ const RPC = {
       name: "Ether",
       symbol: "AETH",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
     },
@@ -130,7 +130,7 @@ const RPC = {
       name: "Celo",
       symbol: "CELO",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590",
     },
@@ -145,7 +145,7 @@ const RPC = {
       name: "Harmony",
       symbol: "ONE",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000",
+      address: null,
       logoURI:
         "https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793",
     },
@@ -160,7 +160,7 @@ const RPC = {
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000", // needed for proper form handling in the TokenFormCard component
+      address: null, // needed for proper form handling in the TokenFormCard component
       logoURI:
         "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
     },
@@ -175,7 +175,7 @@ const RPC = {
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000", // needed for proper form handling in the TokenFormCard component
+      address: null, // needed for proper form handling in the TokenFormCard component
       logoURI:
         "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
     },
@@ -190,7 +190,7 @@ const RPC = {
       name: "Moonriver",
       symbol: "MOVR",
       decimals: 18,
-      address: "0x0000000000000000000000000000000000000000", // needed for proper form handling in the TokenFormCard component
+      address: null, // needed for proper form handling in the TokenFormCard component
       logoURI:
         "https://assets.coingecko.com/coins/images/17984/small/9285.png?1630028620",
     },

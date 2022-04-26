@@ -33,6 +33,7 @@ const customFilterOption = (candidate, input) =>
 const TokenFormCard = ({ index, field }: Props): JSX.Element => {
   const {
     control,
+    resetField,
     getValues,
     setValue,
     clearErrors,
@@ -40,6 +41,7 @@ const TokenFormCard = ({ index, field }: Props): JSX.Element => {
   } = useFormContext<GuildFormType>()
 
   const chain = useWatch({ name: `requirements.${index}.chain` })
+  const type = useWatch({ name: `requirements.${index}.type` })
   const address = useWatch({ name: `requirements.${index}.address` })
 
   const { isLoading, tokens } = useTokens(chain)
@@ -48,7 +50,7 @@ const TokenFormCard = ({ index, field }: Props): JSX.Element => {
       tokens?.map((token) => ({
         img: token.logoURI,
         label: token.name,
-        value: token.address,
+        value: token.address === null ? null : token.address?.toLowerCase(),
         decimals: token.decimals,
       })),
     [tokens]
@@ -57,22 +59,14 @@ const TokenFormCard = ({ index, field }: Props): JSX.Element => {
   // Reset form on chain change
   const resetForm = () => {
     if (!touchedFields?.requirements?.[index]?.address) return
-    setValue(`requirements.${index}.address`, null)
-    setValue(`requirements.${index}.data.minAmount`, 0)
-    setValue(`requirements.${index}.data.maxAmount`, undefined)
-    clearErrors([
-      `requirements.${index}.address`,
-      `requirements.${index}.data.minAmount`,
-      `requirements.${index}.data.maxAmount`,
-    ])
+    resetField(`requirements.${index}.address`)
+    resetField(`requirements.${index}.data.minAmount`)
+    resetField(`requirements.${index}.data.maxAmount`)
   }
 
   // Change type to "COIN" when address changes to "COIN"
   useEffect(() => {
-    setValue(
-      `requirements.${index}.type`,
-      address === "0x0000000000000000000000000000000000000000" ? "COIN" : "ERC20"
-    )
+    setValue(`requirements.${index}.type`, address === null ? "COIN" : "ERC20")
   }, [address])
 
   // Fetching token name and symbol
@@ -104,11 +98,15 @@ const TokenFormCard = ({ index, field }: Props): JSX.Element => {
 
   const tokenImage = useMemo(
     () =>
-      mappedTokens?.find(
-        (token) => token.value?.toLowerCase() === address?.toLowerCase()
+      mappedTokens?.find((token) =>
+        address === null
+          ? token.value === null
+          : token.value === address?.toLowerCase()
       )?.img,
-    [address]
+    [address, chain]
   )
+
+  useEffect(() => clearErrors(`requirements.${index}.address`), [type])
 
   return (
     <>
@@ -130,7 +128,7 @@ const TokenFormCard = ({ index, field }: Props): JSX.Element => {
         <FormLabel>Token:</FormLabel>
 
         <InputGroup>
-          {address &&
+          {typeof address !== "undefined" &&
             (tokenImage ? (
               <InputLeftElement>
                 <OptionImage img={tokenImage} alt={tokenName} />
@@ -151,14 +149,15 @@ const TokenFormCard = ({ index, field }: Props): JSX.Element => {
             control={control}
             defaultValue={field.address}
             rules={{
-              required: "This field is required.",
-              pattern: {
+              required: type === "ERC20" && "This field is required.",
+              pattern: type === "ERC20" && {
                 value: ADDRESS_REGEX,
                 message:
                   "Please input a 42 characters long, 0x-prefixed hexadecimal address.",
               },
               validate: () =>
                 // Using `getValues` instead of `useWatch` here, so the validation is triggered when the input value changes
+                type === "COIN" ||
                 !getValues(`requirements.${index}.address`) ||
                 isTokenSymbolValidating ||
                 tokenDataFetched ||
@@ -179,7 +178,7 @@ const TokenFormCard = ({ index, field }: Props): JSX.Element => {
                         value,
                         label: tokenName && tokenName !== "-" ? tokenName : address,
                       }
-                    : null)
+                    : "")
                 }
                 defaultValue={mappedTokens?.find(
                   (token) => token.value === field.address

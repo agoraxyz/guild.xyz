@@ -21,8 +21,7 @@ const preprocessRequirements = (requirements: Array<Requirement>) => {
           nftRequirementType: undefined,
         }
 
-        if (requirement.address === "0x0000000000000000000000000000000000000000")
-          requirement.address = undefined
+        if (requirement.address === null) requirement.address = undefined
 
         if (
           requirement.data?.attribute &&

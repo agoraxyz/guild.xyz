@@ -61,7 +61,6 @@ const SetRequirements = ({ maxCols = 2 }: Props): JSX.Element => {
   const addRequirement = (type: RequirementType) => {
     append({
       type,
-      address: null,
       data: {},
     })
 
