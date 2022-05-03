@@ -12,6 +12,7 @@ import {
   Text,
   useColorMode,
 } from "@chakra-ui/react"
+import { guild } from "@guildxyz/sdk"
 import { useWeb3React } from "@web3-react/core"
 import AddCard from "components/common/AddCard"
 import Layout from "components/common/Layout"
@@ -31,7 +32,6 @@ import dynamic from "next/dynamic"
 import { useEffect, useMemo, useRef, useState } from "react"
 import useSWR from "swr"
 import { GuildBase } from "types"
-import fetcher from "utils/fetcher"
 
 const AnimatedLogo = dynamic(() => import("components/index/AnimatedLogo"), {
   ssr: false,
@@ -159,9 +159,9 @@ const Page = ({ guilds: guildsInitial }: Props): JSX.Element => {
             {usersGuilds?.length || memberships?.length ? (
               (usersGuilds.length || !search) &&
               usersGuilds
-                .map((guild) => (
-                  <ExplorerCardMotionWrapper key={guild.urlName}>
-                    <GuildCard guildData={guild} />
+                .map((g) => (
+                  <ExplorerCardMotionWrapper key={g.urlName}>
+                    <GuildCard guildData={g} />
                   </ExplorerCardMotionWrapper>
                 ))
                 .concat(
@@ -192,9 +192,9 @@ const Page = ({ guilds: guildsInitial }: Props): JSX.Element => {
             }
           >
             {renderedGuilds.length &&
-              renderedGuilds.map((guild) => (
-                <ExplorerCardMotionWrapper key={guild.urlName}>
-                  <GuildCard guildData={guild} />
+              renderedGuilds.map((g) => (
+                <ExplorerCardMotionWrapper key={g.urlName}>
+                  <GuildCard guildData={g} />
                 </ExplorerCardMotionWrapper>
               ))}
           </CategorySection>
@@ -207,7 +207,7 @@ const Page = ({ guilds: guildsInitial }: Props): JSX.Element => {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const guilds = await fetcher(`/guild?sort=members`).catch((_) => [])
+  const guilds = await guild.getAll().catch((_) => [])
 
   return {
     props: { guilds },

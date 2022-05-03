@@ -1,5 +1,5 @@
+import { guild } from "@guildxyz/sdk"
 import { GuildBase } from "types"
-import fetcher from "utils/fetcher"
 
 export default async function handler(_, res) {
   const baseUrl = {
@@ -7,15 +7,15 @@ export default async function handler(_, res) {
     production: "https://guild.xyz",
   }[process.env.NODE_ENV]
 
-  const guilds = await fetcher(`/guild?sort=members`).catch((_) => [])
+  const guilds = await guild.getAll().catch((_) => [])
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
       ${guilds
         .map(
-          (guild: GuildBase) => `
+          (g: GuildBase) => `
         <url>
-          <loc>${baseUrl}/${guild.urlName}</loc>
+          <loc>${baseUrl}/${g.urlName}</loc>
           <changefreq>weekly</changefreq>
           <priority>1.0</priority>
         </url>

@@ -8,6 +8,7 @@ import {
   VStack,
 } from "@chakra-ui/react"
 import { WithRumComponentContext } from "@datadog/rum-react-integration"
+import { GetGuildsResponse, guild } from "@guildxyz/sdk"
 import GuildLogo from "components/common/GuildLogo"
 import Layout from "components/common/Layout"
 import LinkPreviewHead from "components/common/LinkPreviewHead"
@@ -26,7 +27,6 @@ import dynamic from "next/dynamic"
 import React, { useEffect, useMemo, useState } from "react"
 import { SWRConfig, unstable_serialize, useSWRConfig } from "swr"
 import { Guild } from "types"
-import fetcher from "utils/fetcher"
 
 const GuildPage = (): JSX.Element => {
   const { name, description, imageUrl, platforms, showMembers, roles, admins } =
@@ -167,9 +167,10 @@ const GuildPageWrapper = ({ fallback }: Props): JSX.Element => {
 }
 
 const getStaticProps: GetStaticProps = async ({ params }) => {
-  const endpoint = `/guild/${params.guild?.toString()}`
+  const urlName = params.guild?.toString()
+  const endpoint = `/guild/${urlName}`
 
-  const data = await fetcher(endpoint).catch((_) => ({}))
+  const data = await guild.get(urlName).catch((_) => undefined)
 
   if (!data?.id)
     return {
@@ -188,10 +189,10 @@ const getStaticProps: GetStaticProps = async ({ params }) => {
 }
 
 const getStaticPaths: GetStaticPaths = async () => {
-  const mapToPaths = (_: Guild[]) =>
-    Array.isArray(_) ? _.map(({ urlName: guild }) => ({ params: { guild } })) : []
+  const mapToPaths = (_: GetGuildsResponse) =>
+    Array.isArray(_) ? _.map(({ urlName }) => ({ params: { guild: urlName } })) : []
 
-  const paths = await fetcher(`/guild`).then(mapToPaths)
+  const paths = await guild.getAll().then(mapToPaths)
 
   return {
     paths,

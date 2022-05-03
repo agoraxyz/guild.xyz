@@ -1,67 +1,60 @@
 import { useRumAction, useRumError } from "@datadog/rum-react-integration"
+import { CreateGuildParams, CreateGuildResponse, guild } from "@guildxyz/sdk"
+import { useWeb3React } from "@web3-react/core"
 import useJsConfetti from "components/create-guild/hooks/useJsConfetti"
+import { useSigningManager } from "components/_app/SigningManager"
 import useMatchMutate from "hooks/useMatchMutate"
 import useShowErrorToast from "hooks/useShowErrorToast"
-import { useSubmitWithSign } from "hooks/useSubmit"
-import { WithValidation } from "hooks/useSubmit/useSubmit"
+import useSubmit from "hooks/useSubmit"
 import useToast from "hooks/useToast"
 import { useRouter } from "next/router"
-import { Guild, PlatformName } from "types"
-import fetcher from "utils/fetcher"
+import { GuildFormType } from "types"
 import replacer from "utils/guildJsonReplacer"
 import preprocessRequirements from "utils/preprocessRequirements"
-
-type FormInputs = {
-  platform?: PlatformName
-  DISCORD?: { platformId?: string }
-  TELEGRAM?: { platformId?: string }
-  channelId?: string
-}
-type RoleOrGuild = Guild & FormInputs
 
 const useCreateGuild = () => {
   const addDatadogAction = useRumAction("trackingAppAction")
   const addDatadogError = useRumError()
   const matchMutate = useMatchMutate()
 
+  const { account } = useWeb3React()
+  const { sign } = useSigningManager()
+
   const toast = useToast()
   const showErrorToast = useShowErrorToast()
   const triggerConfetti = useJsConfetti()
   const router = useRouter()
 
-  const fetchData = async ({
-    validation,
-    data,
-  }: WithValidation<RoleOrGuild>): Promise<RoleOrGuild> =>
-    fetcher("/guild", {
-      validation,
-      body: data,
-    })
+  const fetchData = async (data: CreateGuildParams) =>
+    guild.create(account, sign, data)
 
-  const useSubmitResponse = useSubmitWithSign<any, RoleOrGuild>(fetchData, {
-    onError: (error_) => {
-      addDatadogError(`Guild creation error`, { error: error_ }, "custom")
-      showErrorToast(error_)
-    },
-    onSuccess: (response_) => {
-      addDatadogAction(`Successful guild creation`)
-      triggerConfetti()
+  const useSubmitResponse = useSubmit<CreateGuildParams, CreateGuildResponse>(
+    fetchData,
+    {
+      onError: (error_) => {
+        addDatadogError(`Guild creation error`, { error: error_ }, "custom")
+        showErrorToast(error_)
+      },
+      onSuccess: (response_) => {
+        addDatadogAction(`Successful guild creation`)
+        triggerConfetti()
 
-      toast({
-        title: `Guild successfully created!`,
-        description: "You're being redirected to it's page",
-        status: "success",
-      })
-      router.push(`/${response_.urlName}`)
+        toast({
+          title: `Guild successfully created!`,
+          description: "You're being redirected to it's page",
+          status: "success",
+        })
+        router.push(`/${response_.urlName}`)
 
-      matchMutate(/^\/guild\/address\//)
-      matchMutate(/^\/guild\?order/)
-    },
-  })
+        matchMutate(/^\/guild\/address\//)
+        matchMutate(/^\/guild\?order/)
+      },
+    }
+  )
 
   return {
     ...useSubmitResponse,
-    onSubmit: (data_) => {
+    onSubmit: (data_: GuildFormType) => {
       const data = {
         ...data_,
         // Handling TG group ID with and without "-"

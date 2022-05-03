@@ -1,22 +1,25 @@
+import { guild, UpdateGuildParams } from "@guildxyz/sdk"
+import { useWeb3React } from "@web3-react/core"
 import useGuild from "components/[guild]/hooks/useGuild"
+import { useSigningManager } from "components/_app/SigningManager"
 import useMatchMutate from "hooks/useMatchMutate"
 import useShowErrorToast from "hooks/useShowErrorToast"
-import { useSubmitWithSign } from "hooks/useSubmit"
-import { WithValidation } from "hooks/useSubmit/useSubmit"
+import useSubmit from "hooks/useSubmit"
 import useToast from "hooks/useToast"
 import { useRouter } from "next/router"
 import { useSWRConfig } from "swr"
-import { Guild } from "types"
-import fetcher from "utils/fetcher"
 import replacer from "utils/guildJsonReplacer"
 
 type Props = {
   onSuccess?: () => void
-  guildId?: string | number
+  guildId?: number
 }
 
 const useEditGuild = ({ onSuccess, guildId }: Props = {}) => {
-  const guild = useGuild(guildId)
+  const { account } = useWeb3React()
+  const { sign } = useSigningManager()
+
+  const guildData = useGuild(guildId)
 
   const { mutate } = useSWRConfig()
   const matchMutate = useMatchMutate()
@@ -25,27 +28,23 @@ const useEditGuild = ({ onSuccess, guildId }: Props = {}) => {
   const showErrorToast = useShowErrorToast()
   const router = useRouter()
 
-  const id = guildId ?? guild?.id
+  const id = guildId ?? guildData?.id
 
-  const submit = ({ validation, data }: WithValidation<Guild>) =>
-    fetcher(`/guild/${id}`, {
-      method: "PATCH",
-      validation,
-      body: data,
-    })
+  const submit = async (data: UpdateGuildParams) =>
+    guild.update(id, account, sign, data)
 
-  const useSubmitResponse = useSubmitWithSign<Guild, any>(submit, {
+  const useSubmitResponse = useSubmit<UpdateGuildParams, any>(submit, {
     onSuccess: (newGuild) => {
       toast({
         title: `Guild successfully updated!`,
         status: "success",
       })
       if (onSuccess) onSuccess()
-      mutate([`/guild/${guild?.urlName}`, undefined])
+      mutate([`/guild/${guildData?.urlName}`, undefined])
 
       matchMutate(/^\/guild\/address\//)
       matchMutate(/^\/guild\?order/)
-      if (newGuild?.urlName && newGuild.urlName !== guild?.urlName) {
+      if (newGuild?.urlName && newGuild.urlName !== guildData?.urlName) {
         router.push(newGuild.urlName)
       }
     },
@@ -57,17 +56,17 @@ const useEditGuild = ({ onSuccess, guildId }: Props = {}) => {
     onSubmit: (data) => {
       if (
         !!data.isGuarded &&
-        !guild.roles.some((role) =>
+        !guildData.roles.some((role) =>
           role.requirements.some((requirement) => requirement.type === "FREE")
         )
       ) {
         data.roles = [
           {
-            guildId: guild.id,
-            ...(guild.platforms?.[0]
+            guildId: guildData.id,
+            ...(guildData.platforms?.[0]
               ? {
-                  platform: guild.platforms[0].type,
-                  platformId: guild.platforms[0].platformId,
+                  platform: guildData.platforms[0].type,
+                  platformId: guildData.platforms[0].platformId,
                 }
               : {}),
             name: "Verified",

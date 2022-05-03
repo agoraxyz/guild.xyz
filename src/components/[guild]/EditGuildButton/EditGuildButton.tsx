@@ -32,6 +32,7 @@ import MembersToggle from "components/[guild]/EditGuildButton/components/Members
 import UrlName from "components/[guild]/EditGuildButton/components/UrlName"
 import useGuild from "components/[guild]/hooks/useGuild"
 import { useThemeContext } from "components/[guild]/ThemeContext"
+import { useSigningManager } from "components/_app/SigningManager"
 import useLocalStorage from "hooks/useLocalStorage"
 import useUploadPromise from "hooks/useUploadPromise"
 import useWarnIfUnsavedChanges from "hooks/useWarnIfUnsavedChanges"
@@ -100,7 +101,8 @@ const EditGuildButton = ({
     setUploadPromise(null)
   }
 
-  const { onSubmit, isLoading, isSigning } = useEditGuild({ onSuccess })
+  const { onSubmit, isLoading } = useEditGuild({ onSuccess })
+  const { isSigning } = useSigningManager()
 
   const {
     localThemeColor,

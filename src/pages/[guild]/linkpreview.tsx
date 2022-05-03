@@ -8,11 +8,11 @@ import {
   Tag,
   Text,
 } from "@chakra-ui/react"
+import { guild } from "@guildxyz/sdk"
 import GuildAvatar from "components/common/GuildAvatar"
 import { GetServerSideProps } from "next"
 import Head from "next/head"
 import { Guild, GuildBase } from "types"
-import fetcher from "utils/fetcher"
 
 const unique = (value, index, self): boolean => self.indexOf(value) === index
 
@@ -123,11 +123,10 @@ const LinkPreview = ({ guildData }: Props): JSX.Element => (
 )
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const endpoint = `/guild/${params.guild?.toString()}`
+  const urlName = params.guild?.toString()
+  const data = await guild.get(urlName)
 
-  const data = await fetcher(endpoint)
-
-  if (data.errors) {
+  if (!data) {
     return {
       props: {
         guildData: null,

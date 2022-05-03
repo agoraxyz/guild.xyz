@@ -8,11 +8,11 @@ import {
   Tag,
   Text,
 } from "@chakra-ui/react"
+import { guild } from "@guildxyz/sdk"
 import GuildCard from "components/index/GuildCard"
 import { GetStaticProps } from "next"
 import Head from "next/head"
 import { GuildBase } from "types"
-import fetcher from "utils/fetcher"
 
 type Props = {
   guilds: Array<GuildBase>
@@ -36,8 +36,8 @@ const LinkPreview = ({ guilds }: Props): JSX.Element => (
         transform="scale(1.25)"
         transformOrigin="top"
       >
-        {guilds?.slice(0, 12).map((guild) => (
-          <GuildCard key={guild.urlName} guildData={guild} />
+        {guilds?.slice(0, 12).map((g) => (
+          <GuildCard key={g.urlName} guildData={g} />
         ))}
       </SimpleGrid>
 
@@ -94,7 +94,7 @@ const LinkPreview = ({ guilds }: Props): JSX.Element => (
 )
 
 export const getStaticProps: GetStaticProps = async () => {
-  const guilds = await fetcher(`/guild?sort=members`).catch((_) => [])
+  const guilds = await guild.getAll().catch((_) => [])
   const WEEK_IN_SECONDS = 604800
 
   return {
