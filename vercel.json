@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/linkpreview": {
+    "api/linkpreview/**/*.ts": {
       "runtime": "@vercel/node@14.0.0"
     }
   },
