@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/linkpreview": {
+      "runtime": "@vercel/node"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
