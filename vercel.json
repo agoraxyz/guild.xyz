@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/linkpreview/**/*.ts": {
-      "runtime": "@vercel/node@14.0.0"
+      "runtime": "@vercel/node@2.2.0"
     }
   },
   "headers": [
