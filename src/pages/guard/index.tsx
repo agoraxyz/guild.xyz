@@ -3,7 +3,7 @@ import Card from "components/common/Card"
 import NavMenu from "components/common/Layout/components/NavMenu"
 import LandingButton from "components/index/LandingButton"
 import useDCAuthWithCallback from "components/[guild]/RolesByPlatform/components/JoinButton/components/JoinModal/hooks/useDCAuthWithCallback"
-import { motion, useTransform, useViewportScroll } from "framer-motion"
+import { LazyMotion, m, useTransform, useViewportScroll } from "framer-motion"
 import dynamic from "next/dynamic"
 import Head from "next/head"
 import { useRouter } from "next/router"
@@ -14,7 +14,9 @@ const META_TITLE = "Guild Guard - Protect your community"
 const META_DESCRIPTION =
   "Guild Guard provides full protection against Discord scams. No more bots spam."
 
-const MotionBox = motion(Box)
+const loadDomAnimationFeatures = () =>
+  import("../../framerMotion/domAnimation").then((res) => res.default)
+const MotionBox = m(Box)
 
 const Page = (): JSX.Element => {
   const { scrollY } = useViewportScroll()
@@ -61,30 +63,32 @@ const Page = (): JSX.Element => {
         alignItems="center"
         justifyContent="start"
       >
-        <MotionBox
-          position="absolute"
-          top={0}
-          left={0}
-          width="full"
-          height="100vh"
-          bgImage="url('/guildGuard/bg.svg')"
-          bgSize={{ base: "cover", lg: "calc(100% - 2.25rem) auto" }}
-          bgPosition="top 1.75rem center"
-          bgRepeat="no-repeat"
-          opacity={0.075}
-          initial={{
-            y: 0,
-          }}
-          style={{
-            y,
-          }}
-        >
-          <Box
+        <LazyMotion features={loadDomAnimationFeatures}>
+          <MotionBox
             position="absolute"
-            inset={0}
-            bgGradient="linear-gradient(to top, var(--chakra-colors-gray-800), transparent)"
-          />
-        </MotionBox>
+            top={0}
+            left={0}
+            width="full"
+            height="100vh"
+            bgImage="url('/guildGuard/bg.svg')"
+            bgSize={{ base: "cover", lg: "calc(100% - 2.25rem) auto" }}
+            bgPosition="top 1.75rem center"
+            bgRepeat="no-repeat"
+            opacity={0.075}
+            initial={{
+              y: 0,
+            }}
+            style={{
+              y,
+            }}
+          >
+            <Box
+              position="absolute"
+              inset={0}
+              bgGradient="linear-gradient(to top, var(--chakra-colors-gray-800), transparent)"
+            />
+          </MotionBox>
+        </LazyMotion>
         <Box pos={"absolute"} top="2" left="2" zIndex={1}>
           <NavMenu />
         </Box>

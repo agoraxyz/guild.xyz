@@ -20,13 +20,16 @@ import Button from "components/common/Button"
 import FormErrorMessage from "components/common/FormErrorMessage"
 import { Modal } from "components/common/Modal"
 import useGuild from "components/[guild]/hooks/useGuild"
-import { domAnimation, LazyMotion, m } from "framer-motion"
+import { LazyMotion, m } from "framer-motion"
 import useDropzone from "hooks/useDropzone"
 import { Check, File, TrashSimple } from "phosphor-react"
 import { useEffect, useState } from "react"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 import { GuildFormType, Requirement } from "types"
 import mapRequirements from "utils/mapRequirements"
+
+const loadDomAnimationFeatures = () =>
+  import("../../../../framerMotion/domAnimation").then((res) => res.default)
 
 type Props = {
   index: number
@@ -226,7 +229,7 @@ const AllowlistFormCard = ({ index }: Props): JSX.Element => {
       <Modal size="xl" isOpen={isOpen} onClose={closeModal}>
         <ModalOverlay />
         <ModalContent>
-          <LazyMotion features={domAnimation}>
+          <LazyMotion features={loadDomAnimationFeatures}>
             <m.div
               onAnimationComplete={() => setErrorAnimation("translateX(0px)")}
               style={{

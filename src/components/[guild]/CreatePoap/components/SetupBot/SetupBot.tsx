@@ -20,7 +20,7 @@ import useJsConfetti from "components/create-guild/hooks/useJsConfetti"
 import useGuild from "components/[guild]/hooks/useGuild"
 import useSendJoin from "components/[guild]/Onboarding/components/SummonMembers/hooks/useSendJoin"
 import useDCAuth from "components/[guild]/RolesByPlatform/components/JoinButton/components/JoinModal/hooks/useDCAuth"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, LazyMotion, m } from "framer-motion"
 import useServerData from "hooks/useServerData"
 import { ArrowRight, LockSimple } from "phosphor-react"
 import { useMemo } from "react"
@@ -31,7 +31,9 @@ import EmbedButton from "./components/EmbedButton"
 import EmbedDescription from "./components/EmbedDescription"
 import EmbedTitle from "./components/EmbedTitle"
 
-const MotionBox = motion(Box)
+const loadDomAnimationFeatures = () =>
+  import("../../../../../framerMotion/domAnimation").then((res) => res.default)
+const MotionBox = m(Box)
 
 type PoapDiscordEmbedForm = {
   channelId: string
@@ -94,162 +96,164 @@ const SetupBot = ({ onCloseHandler }: Props): JSX.Element => {
 
   return (
     <AnimatePresence initial={false} exitBeforeEnter>
-      <MotionBox
-        key={response ? "success" : "setup-form"}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.24 }}
-      >
-        {response ? (
-          <VStack spacing={6}>
-            <VStack
-              pb={32}
-              spacing={6}
-              alignItems={{ base: "start", md: "center" }}
-              bg="url('/img/poap-illustration.svg') no-repeat bottom center"
-            >
-              <Text fontSize="3xl" fontFamily="display" fontWeight="bold">
-                Hooray!
-              </Text>
-              <Text textAlign={{ base: "left", md: "center" }} maxW="md">
-                You've successfully dropped a POAP and set up a claim button on your
-                Discord server for it - now your friends can claim this magnificent
-                POAP to their collection!
-              </Text>
-            </VStack>
-
-            <Flex w="full" justifyContent="end">
-              <Button colorScheme="indigo" onClick={onCloseHandler}>
-                Done
-              </Button>
-            </Flex>
-          </VStack>
-        ) : (
-          <VStack spacing={12} alignItems={{ base: "start", md: "center" }}>
-            <Text textAlign={{ base: "left", md: "center" }}>
-              Feel free to customize the embed below - the bot will send this to your
-              Discord server and your Guild's members will be able to claim their
-              POAP using the button in it.
-            </Text>
-
-            <FormProvider {...methods}>
-              <Box mx="auto" w="full" maxW="md">
-                <FormControl>
-                  <FormLabel>Channel to send to</FormLabel>
-
-                  {!authorization?.length ? (
-                    <Button
-                      onClick={onAuthOpen}
-                      isLoading={isAuthenticating}
-                      loadingText="Check the popup window"
-                      spinnerPlacement="end"
-                      rightIcon={<LockSimple />}
-                      variant="outline"
-                      w="full"
-                      h={12}
-                      justifyContent="space-between"
-                    >
-                      Authenticate to view channels
-                    </Button>
-                  ) : mappedChannels?.length <= 0 ? (
-                    <Button
-                      isDisabled
-                      isLoading
-                      loadingText="Loading channels"
-                      w="full"
-                    />
-                  ) : (
-                    <Select {...methods.register("channelId")} maxW="sm">
-                      {mappedChannels.map((channel, index) => (
-                        <option
-                          key={channel.id}
-                          value={channel.id}
-                          defaultChecked={index === 0}
-                        >
-                          {channel.name}
-                        </option>
-                      ))}
-                    </Select>
-                  )}
-                </FormControl>
-              </Box>
-
-              <FormControl
-                maxW="md"
-                mb={12}
-                isInvalid={!!Object.keys(methods.formState.errors).length}
+      <LazyMotion features={loadDomAnimationFeatures}>
+        <MotionBox
+          key={response ? "success" : "setup-form"}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.24 }}
+        >
+          {response ? (
+            <VStack spacing={6}>
+              <VStack
+                pb={32}
+                spacing={6}
+                alignItems={{ base: "start", md: "center" }}
+                bg="url('/img/poap-illustration.svg') no-repeat bottom center"
               >
-                <Box mx="auto" maxW="md">
-                  <Box
-                    bg={embedBg}
-                    borderRadius={"4px"}
-                    mb={2}
-                    p={4}
-                    borderLeft={"4px solid var(--chakra-colors-DISCORD-500)"}
-                  >
-                    <Grid templateColumns={`1fr ${EMBED_IMAGE_SIZE}`} gap={3}>
-                      <VStack alignItems="left">
-                        <HStack spacing={2}>
-                          <Center
-                            h="26px"
-                            w="26px"
-                            borderRadius="full"
-                            overflow={"hidden"}
-                          >
-                            {shouldShowGuildImage && imageUrl && (
-                              <Image
-                                width={26}
-                                height={26}
-                                src={imageUrl}
-                                alt="Guild Icon"
-                              />
-                            )}
-                          </Center>
-
-                          <Text fontSize={"sm"} fontWeight="bold">
-                            {name}
-                          </Text>
-                        </HStack>
-
-                        <EmbedTitle />
-                        <EmbedDescription />
-                      </VStack>
-
-                      <Box m={1} boxSize={EMBED_IMAGE_SIZE}>
-                        <Image src="/requirementLogos/poap.svg" alt="POAP image" />
-                      </Box>
-                    </Grid>
-
-                    <Text mt={2} fontSize="xs">
-                      Do not share your private keys. We will never ask for your seed
-                      phrase.
-                    </Text>
-                  </Box>
-                  <EmbedButton />
-                </Box>
-
-                <FormErrorMessage>Some fields are empty</FormErrorMessage>
-              </FormControl>
+                <Text fontSize="3xl" fontFamily="display" fontWeight="bold">
+                  Hooray!
+                </Text>
+                <Text textAlign={{ base: "left", md: "center" }} maxW="md">
+                  You've successfully dropped a POAP and set up a claim button on
+                  your Discord server for it - now your friends can claim this
+                  magnificent POAP to their collection!
+                </Text>
+              </VStack>
 
               <Flex w="full" justifyContent="end">
-                <Button
-                  colorScheme="indigo"
-                  rightIcon={<Icon as={ArrowRight} />}
-                  onClick={methods.handleSubmit(onSubmit, console.log)}
-                  isLoading={isLoading || isSigning}
-                  loadingText={loadingText}
-                  isDisabled={isLoading || isSigning || response}
-                >
-                  Send embed
+                <Button colorScheme="indigo" onClick={onCloseHandler}>
+                  Done
                 </Button>
               </Flex>
+            </VStack>
+          ) : (
+            <VStack spacing={12} alignItems={{ base: "start", md: "center" }}>
+              <Text textAlign={{ base: "left", md: "center" }}>
+                Feel free to customize the embed below - the bot will send this to
+                your Discord server and your Guild's members will be able to claim
+                their POAP using the button in it.
+              </Text>
 
-              <DynamicDevTool control={methods.control} />
-            </FormProvider>
-          </VStack>
-        )}
-      </MotionBox>
+              <FormProvider {...methods}>
+                <Box mx="auto" w="full" maxW="md">
+                  <FormControl>
+                    <FormLabel>Channel to send to</FormLabel>
+
+                    {!authorization?.length ? (
+                      <Button
+                        onClick={onAuthOpen}
+                        isLoading={isAuthenticating}
+                        loadingText="Check the popup window"
+                        spinnerPlacement="end"
+                        rightIcon={<LockSimple />}
+                        variant="outline"
+                        w="full"
+                        h={12}
+                        justifyContent="space-between"
+                      >
+                        Authenticate to view channels
+                      </Button>
+                    ) : mappedChannels?.length <= 0 ? (
+                      <Button
+                        isDisabled
+                        isLoading
+                        loadingText="Loading channels"
+                        w="full"
+                      />
+                    ) : (
+                      <Select {...methods.register("channelId")} maxW="sm">
+                        {mappedChannels.map((channel, index) => (
+                          <option
+                            key={channel.id}
+                            value={channel.id}
+                            defaultChecked={index === 0}
+                          >
+                            {channel.name}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
+                  </FormControl>
+                </Box>
+
+                <FormControl
+                  maxW="md"
+                  mb={12}
+                  isInvalid={!!Object.keys(methods.formState.errors).length}
+                >
+                  <Box mx="auto" maxW="md">
+                    <Box
+                      bg={embedBg}
+                      borderRadius={"4px"}
+                      mb={2}
+                      p={4}
+                      borderLeft={"4px solid var(--chakra-colors-DISCORD-500)"}
+                    >
+                      <Grid templateColumns={`1fr ${EMBED_IMAGE_SIZE}`} gap={3}>
+                        <VStack alignItems="left">
+                          <HStack spacing={2}>
+                            <Center
+                              h="26px"
+                              w="26px"
+                              borderRadius="full"
+                              overflow={"hidden"}
+                            >
+                              {shouldShowGuildImage && imageUrl && (
+                                <Image
+                                  width={26}
+                                  height={26}
+                                  src={imageUrl}
+                                  alt="Guild Icon"
+                                />
+                              )}
+                            </Center>
+
+                            <Text fontSize={"sm"} fontWeight="bold">
+                              {name}
+                            </Text>
+                          </HStack>
+
+                          <EmbedTitle />
+                          <EmbedDescription />
+                        </VStack>
+
+                        <Box m={1} boxSize={EMBED_IMAGE_SIZE}>
+                          <Image src="/requirementLogos/poap.svg" alt="POAP image" />
+                        </Box>
+                      </Grid>
+
+                      <Text mt={2} fontSize="xs">
+                        Do not share your private keys. We will never ask for your
+                        seed phrase.
+                      </Text>
+                    </Box>
+                    <EmbedButton />
+                  </Box>
+
+                  <FormErrorMessage>Some fields are empty</FormErrorMessage>
+                </FormControl>
+
+                <Flex w="full" justifyContent="end">
+                  <Button
+                    colorScheme="indigo"
+                    rightIcon={<Icon as={ArrowRight} />}
+                    onClick={methods.handleSubmit(onSubmit, console.log)}
+                    isLoading={isLoading || isSigning}
+                    loadingText={loadingText}
+                    isDisabled={isLoading || isSigning || response}
+                  >
+                    Send embed
+                  </Button>
+                </Flex>
+
+                <DynamicDevTool control={methods.control} />
+              </FormProvider>
+            </VStack>
+          )}
+        </MotionBox>
+      </LazyMotion>
     </AnimatePresence>
   )
 }

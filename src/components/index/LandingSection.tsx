@@ -1,5 +1,5 @@
 import { Box, Container, GridItem, SimpleGrid, VStack } from "@chakra-ui/react"
-import { motion, useAnimation } from "framer-motion"
+import { LazyMotion, m, useAnimation } from "framer-motion"
 import { useEffect } from "react"
 import { useInView } from "react-intersection-observer"
 import LandingSectionTitle from "./LandingSectionTitle"
@@ -22,7 +22,9 @@ const variants = {
   },
 }
 
-const MotionGridItem = motion(GridItem)
+const loadDomAnimationFeatures = () =>
+  import("../../framerMotion/domAnimation").then((res) => res.default)
+const MotionGridItem = m(GridItem)
 
 const LandingSection = ({ title, media, content, flipped }: Props): JSX.Element => {
   const controls = useAnimation()
@@ -43,39 +45,41 @@ const LandingSection = ({ title, media, content, flipped }: Props): JSX.Element 
           columnGap={{ base: 0, md: 10, lg: 16 }}
           w="full"
         >
-          <MotionGridItem
-            initial="hidden"
-            animate={controls}
-            variants={variants}
-            colSpan={{ base: 12, md: 6, lg: 5 }}
-            order={{ base: 1, md: flipped ? 2 : 1 }}
-            w="full"
-          >
-            <VStack
-              spacing={4}
-              py={4}
-              textAlign={{ base: "center", md: "left" }}
-              maxW="330px"
-              alignItems={{ md: "start" }}
-              mx={{ base: "auto", md: "unset" }}
+          <LazyMotion features={loadDomAnimationFeatures}>
+            <MotionGridItem
+              initial="hidden"
+              animate={controls}
+              variants={variants}
+              colSpan={{ base: 12, md: 6, lg: 5 }}
+              order={{ base: 1, md: flipped ? 2 : 1 }}
+              w="full"
             >
-              <LandingSectionTitle>{title}</LandingSectionTitle>
-              {content}
-            </VStack>
-          </MotionGridItem>
+              <VStack
+                spacing={4}
+                py={4}
+                textAlign={{ base: "center", md: "left" }}
+                maxW="330px"
+                alignItems={{ md: "start" }}
+                mx={{ base: "auto", md: "unset" }}
+              >
+                <LandingSectionTitle>{title}</LandingSectionTitle>
+                {content}
+              </VStack>
+            </MotionGridItem>
 
-          <MotionGridItem
-            initial="hidden"
-            animate={controls}
-            variants={variants}
-            colSpan={{ base: 12, md: 6, lg: 7 }}
-            order={{ base: 2, md: flipped ? 1 : 2 }}
-            w="full"
-            maxW={{ sm: "70%", md: "full" }}
-            justifySelf="center"
-          >
-            {media}
-          </MotionGridItem>
+            <MotionGridItem
+              initial="hidden"
+              animate={controls}
+              variants={variants}
+              colSpan={{ base: 12, md: 6, lg: 7 }}
+              order={{ base: 2, md: flipped ? 1 : 2 }}
+              w="full"
+              maxW={{ sm: "70%", md: "full" }}
+              justifySelf="center"
+            >
+              {media}
+            </MotionGridItem>
+          </LazyMotion>
         </SimpleGrid>
       </Container>
     </Box>

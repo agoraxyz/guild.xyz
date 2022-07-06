@@ -38,7 +38,7 @@ const BalancyCounter = ({ ...rest }) => {
   }
 
   return (
-    <HStack spacing={4} {...rest}>
+    <HStack spacing={4} h={4} {...rest}>
       {typeof holders === "number" ? (
         <HStack>
           {inaccuracy > 0 && (
@@ -61,7 +61,7 @@ const BalancyCounter = ({ ...rest }) => {
             <PopoverTrigger>
               <Question color="gray" />
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent position="relative">
               <PopoverArrow />
               <PopoverBody>
                 <Text>

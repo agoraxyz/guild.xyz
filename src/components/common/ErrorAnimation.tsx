@@ -1,5 +1,8 @@
-import { domAnimation, LazyMotion, m } from "framer-motion"
+import { LazyMotion, m } from "framer-motion"
 import { PropsWithChildren, useEffect, useState } from "react"
+
+const loadDomAnimationFeatures = () =>
+  import("../../framerMotion/domAnimation").then((res) => res.default)
 
 type Props = {
   errors: any
@@ -28,7 +31,7 @@ const ErrorAnimation = ({
   }, [errors])
 
   return (
-    <LazyMotion features={domAnimation}>
+    <LazyMotion features={loadDomAnimationFeatures}>
       <m.div
         onAnimationComplete={() => setErrorAnimation("translateX(0px)")}
         style={{

@@ -9,7 +9,7 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react"
 import { useRumAction } from "@datadog/rum-react-integration"
-import { AnimatePresence, AnimateSharedLayout } from "framer-motion"
+import { AnimatePresence, LayoutGroup } from "framer-motion"
 import { useMemo } from "react"
 import { useFieldArray, useFormContext } from "react-hook-form"
 import { GuildFormType, Requirement, RequirementType } from "types"
@@ -124,12 +124,12 @@ const SetRequirements = ({ maxCols = 2 }: Props): JSX.Element => {
         </HStack>
 
         {!freeEntry && isMobile && <BalancyCounter />}
-        <AnimateSharedLayout>
+        <LayoutGroup>
           <SimpleGrid
-            position="relative"
             opacity={freeEntry ? 0.5 : 1}
             columns={{ base: 1, md: 2, lg: maxCols }}
             spacing={{ base: 5, md: 6 }}
+            h="full"
           >
             <AnimatePresence>
               {controlledFields.map((field: Requirement, i) => {
@@ -163,7 +163,7 @@ const SetRequirements = ({ maxCols = 2 }: Props): JSX.Element => {
               bgColor="transparent"
             />
           </SimpleGrid>
-        </AnimateSharedLayout>
+        </LayoutGroup>
       </FormControl>
     </>
   )

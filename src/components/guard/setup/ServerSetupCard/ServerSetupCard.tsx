@@ -8,7 +8,7 @@ import DiscordRoleVideo from "components/common/DiscordRoleVideo"
 import useCreateGuild from "components/create-guild/hooks/useCreateGuild"
 import useSetImageAndNameFromPlatformData from "components/create-guild/hooks/useSetImageAndNameFromPlatformData"
 import { Web3Connection } from "components/_app/Web3ConnectionManager"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, LazyMotion, m } from "framer-motion"
 import usePinata from "hooks/usePinata"
 import useServerData from "hooks/useServerData"
 import useSubmitWithUpload from "hooks/useSubmitWithUpload"
@@ -18,7 +18,9 @@ import { useContext, useEffect, useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import getRandomInt from "utils/getRandomInt"
 
-const MotionStack = motion(Stack)
+const loadDomMaxFeatures = () =>
+  import("../../../../framerMotion/domMax").then((res) => res.default)
+const MotionStack = m(Stack)
 
 const ServerSetupCard = ({ children }): JSX.Element => {
   const addDatadogAction = useRumAction("trackingAppAction")
@@ -81,16 +83,18 @@ const ServerSetupCard = ({ children }): JSX.Element => {
       <Card px={{ base: 5, sm: 6 }} py={7}>
         <Stack spacing={8}>
           <AnimatePresence initial={false} exitBeforeEnter>
-            <MotionStack
-              key={watchedVideo ? "form" : "video"}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.24 }}
-              spacing={8}
-            >
-              {watchedVideo ? children : <DiscordRoleVideo />}
-            </MotionStack>
+            <LazyMotion features={loadDomMaxFeatures}>
+              <MotionStack
+                key={watchedVideo ? "form" : "video"}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.24 }}
+                spacing={8}
+              >
+                {watchedVideo ? children : <DiscordRoleVideo />}
+              </MotionStack>
+            </LazyMotion>
           </AnimatePresence>
 
           <SimpleGrid columns={2} gap={4}>

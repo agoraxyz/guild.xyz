@@ -16,7 +16,7 @@ import { Step, Steps, useSteps } from "chakra-ui-steps"
 import Button from "components/common/Button"
 import { Modal } from "components/common/Modal"
 import useGuild from "components/[guild]/hooks/useGuild"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, LazyMotion, m } from "framer-motion"
 import { Plus } from "phosphor-react"
 import {
   CreatePoapProvider,
@@ -53,7 +53,9 @@ type Props = {
   onClose: () => void
 }
 
-const MotionBox = motion(Box)
+const loadDomAnimationFeatures = () =>
+  import("../../../framerMotion/domAnimation").then((res) => res.default)
+const MotionBox = m(Box)
 
 const CreatePoap = ({ isOpen, onClose }: Props): JSX.Element => {
   const poapListBg = useColorModeValue("gray.200", "blackAlpha.300")
@@ -101,64 +103,66 @@ const CreatePoap = ({ isOpen, onClose }: Props): JSX.Element => {
         </ModalHeader>
         <ModalBody bgColor={modalBg}>
           <AnimatePresence initial={false} exitBeforeEnter>
-            <MotionBox
-              key={
-                poaps?.length && !poapData?.id && !shouldCreatePoap
-                  ? "select-poap"
-                  : "create-poap"
-              }
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.24 }}
-            >
-              {poaps?.length && !poapData?.id && !shouldCreatePoap ? (
-                <Stack spacing={4} mx="auto" maxW="md">
-                  <Stack
-                    p={4}
-                    bgColor={poapListBg}
-                    borderRadius="2xl"
-                    divider={<Divider />}
-                  >
-                    {poaps.map((poap, index) => (
-                      <PoapListItem
-                        key={poap?.id}
-                        poapFancyId={poap?.fancyId}
-                        setStep={setStep}
-                        isDisabled={index < poaps.length - 1}
-                      />
-                    ))}
+            <LazyMotion features={loadDomAnimationFeatures}>
+              <MotionBox
+                key={
+                  poaps?.length && !poapData?.id && !shouldCreatePoap
+                    ? "select-poap"
+                    : "create-poap"
+                }
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.24 }}
+              >
+                {poaps?.length && !poapData?.id && !shouldCreatePoap ? (
+                  <Stack spacing={4} mx="auto" maxW="md">
+                    <Stack
+                      p={4}
+                      bgColor={poapListBg}
+                      borderRadius="2xl"
+                      divider={<Divider />}
+                    >
+                      {poaps.map((poap, index) => (
+                        <PoapListItem
+                          key={poap?.id}
+                          poapFancyId={poap?.fancyId}
+                          setStep={setStep}
+                          isDisabled={index < poaps.length - 1}
+                        />
+                      ))}
+                    </Stack>
+
+                    <HStack>
+                      <Divider />
+                      <Text as="span" fontWeight="bold" fontSize="sm" color="gray">
+                        OR
+                      </Text>
+                      <Divider />
+                    </HStack>
+
+                    <Button
+                      colorScheme="indigo"
+                      leftIcon={<Icon as={Plus} />}
+                      onClick={() => setShouldCreatePoap(true)}
+                      // isDisabled={poaps?.length > 0}
+                    >
+                      Create a POAP
+                    </Button>
                   </Stack>
-
-                  <HStack>
-                    <Divider />
-                    <Text as="span" fontWeight="bold" fontSize="sm" color="gray">
-                      OR
-                    </Text>
-                    <Divider />
-                  </HStack>
-
-                  <Button
-                    colorScheme="indigo"
-                    leftIcon={<Icon as={Plus} />}
-                    onClick={() => setShouldCreatePoap(true)}
-                    // isDisabled={poaps?.length > 0}
-                  >
-                    Create a POAP
-                  </Button>
-                </Stack>
-              ) : (
-                <Steps colorScheme="indigo" size="sm" activeStep={activeStep}>
-                  {steps.map(({ label, content: Content }) => (
-                    <Step label={label} key={label}>
-                      <Box pt={{ base: 4, md: 12 }}>
-                        <Content {...{ nextStep, setStep, onCloseHandler }} />
-                      </Box>
-                    </Step>
-                  ))}
-                </Steps>
-              )}
-            </MotionBox>
+                ) : (
+                  <Steps colorScheme="indigo" size="sm" activeStep={activeStep}>
+                    {steps.map(({ label, content: Content }) => (
+                      <Step label={label} key={label}>
+                        <Box pt={{ base: 4, md: 12 }}>
+                          <Content {...{ nextStep, setStep, onCloseHandler }} />
+                        </Box>
+                      </Step>
+                    ))}
+                  </Steps>
+                )}
+              </MotionBox>
+            </LazyMotion>
           </AnimatePresence>
         </ModalBody>
       </ModalContent>

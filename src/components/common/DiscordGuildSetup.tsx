@@ -4,7 +4,7 @@ import ErrorAlert from "components/common/ErrorAlert"
 import DCServerCard from "components/guard/setup/DCServerCard"
 import ServerSetupCard from "components/guard/setup/ServerSetupCard"
 import useDCAuth from "components/[guild]/RolesByPlatform/components/JoinButton/components/JoinModal/hooks/useDCAuth"
-import { AnimatePresence, AnimateSharedLayout } from "framer-motion"
+import { AnimatePresence, LayoutGroup } from "framer-motion"
 import useUsersServers from "hooks/useUsersServers"
 import { useEffect, useMemo, useState } from "react"
 import { useFormContext } from "react-hook-form"
@@ -53,7 +53,7 @@ const DiscordGuildSetup = ({ defaultValues, selectedServer, children }) => {
 
   return (
     <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={{ base: 4, md: 6 }}>
-      <AnimateSharedLayout>
+      <LayoutGroup>
         <AnimatePresence>
           {(selectedServerOption ? [selectedServerOption] : servers ?? []).map(
             (serverData) => (
@@ -84,7 +84,7 @@ const DiscordGuildSetup = ({ defaultValues, selectedServer, children }) => {
             </GridItem>
           )}
         </AnimatePresence>
-      </AnimateSharedLayout>
+      </LayoutGroup>
     </SimpleGrid>
   )
 }

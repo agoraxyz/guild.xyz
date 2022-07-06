@@ -1,5 +1,5 @@
 import { Box, Container, Stack } from "@chakra-ui/react"
-import { motion, useAnimation } from "framer-motion"
+import { LazyMotion, m, useAnimation } from "framer-motion"
 import { PropsWithChildren, useEffect } from "react"
 import { useInView } from "react-intersection-observer"
 import { Rest } from "types"
@@ -20,7 +20,9 @@ const variants = {
   },
 }
 
-const MotionStack = motion(Stack)
+const loadDomAnimationFeatures = () =>
+  import("../../framerMotion/domAnimation").then((res) => res.default)
+const MotionStack = m(Stack)
 
 const LandingWideSection = ({
   title,
@@ -49,18 +51,20 @@ const LandingWideSection = ({
         maxW={{ base: "container.sm", md: "container.md", lg: "container.lg" }}
         px={{ base: 8, lg: 10 }}
       >
-        <MotionStack
-          ref={ref}
-          as="section"
-          initial="hidden"
-          animate={controls}
-          variants={variants}
-          spacing={{ base: 8, md: 12 }}
-          {...rest}
-        >
-          <LandingSectionTitle textAlign="center">{title}</LandingSectionTitle>
-          {children}
-        </MotionStack>
+        <LazyMotion features={loadDomAnimationFeatures}>
+          <MotionStack
+            ref={ref}
+            as="section"
+            initial="hidden"
+            animate={controls}
+            variants={variants}
+            spacing={{ base: 8, md: 12 }}
+            {...rest}
+          >
+            <LandingSectionTitle textAlign="center">{title}</LandingSectionTitle>
+            {children}
+          </MotionStack>
+        </LazyMotion>
       </Container>
     </Box>
   )

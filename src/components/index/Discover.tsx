@@ -1,13 +1,15 @@
 import { Box, Flex, Heading, Img, Stack, Text, useColorMode } from "@chakra-ui/react"
 import Card from "components/common/Card"
 import Link from "components/common/Link"
-import { motion } from "framer-motion"
+import { LazyMotion, m } from "framer-motion"
 import { CaretDown } from "phosphor-react"
 import { useState } from "react"
 import LandingButton from "./LandingButton"
 import LandingWideSection from "./LandingWideSection"
 
-const MotionBox = motion(Box)
+const loadDomAnimationFeatures = () =>
+  import("../../framerMotion/domAnimation").then((res) => res.default)
+const MotionBox = m(Box)
 
 const openGraphData = [
   {
@@ -67,72 +69,74 @@ const Discover = (): JSX.Element => {
       position="relative"
       mb={-8}
     >
-      <MotionBox
-        position="relative"
-        initial={{
-          height: "80vh",
-        }}
-        animate={{ height: sectionHeight }}
-        overflow="hidden"
-      >
-        <Box
-          gap={{ base: 6, lg: 8 }}
-          mt={{ base: -2, md: -4 }}
-          sx={{
-            columnCount: [1, 1, 2],
-          }}
-        >
-          {openGraphData?.map((link) => (
-            <Link
-              key={link.url}
-              href={link.url}
-              isExternal
-              w="full"
-              _hover={{ textDecoration: "none" }}
-            >
-              <Card
-                role="group"
-                my={{ base: 2, md: 3, lg: 4 }}
-                w="full"
-                _hover={{
-                  bg: colorMode === "light" ? "gray.50" : "gray.600",
-                }}
-              >
-                {link.image && (
-                  <Img
-                    w="full"
-                    src={link.image}
-                    alt={link.title}
-                    _groupHover={{ opacity: 0.8 }}
-                  />
-                )}
-                <Stack px={{ base: 5, sm: 6 }} py={7}>
-                  <Heading as="h4" fontSize="xl" fontFamily="display">
-                    {link.title}
-                  </Heading>
-                  {link.description && (
-                    <Text colorScheme="gray">{link.description}</Text>
-                  )}
-                </Stack>
-              </Card>
-            </Link>
-          ))}
-        </Box>
-
+      <LazyMotion features={loadDomAnimationFeatures}>
         <MotionBox
-          position="absolute"
-          inset={-1}
-          bgGradient="linear-gradient(to top, var(--chakra-colors-gray-800), rgba(39, 39, 42, 0))"
-          zIndex="banner"
-          pointerEvents="none"
+          position="relative"
           initial={{
-            opacity: 0,
+            height: "80vh",
           }}
-          animate={{
-            opacity: sectionHeight === "auto" ? 0 : 1,
-          }}
-        />
-      </MotionBox>
+          animate={{ height: sectionHeight }}
+          overflow="hidden"
+        >
+          <Box
+            gap={{ base: 6, lg: 8 }}
+            mt={{ base: -2, md: -4 }}
+            sx={{
+              columnCount: [1, 1, 2],
+            }}
+          >
+            {openGraphData?.map((link) => (
+              <Link
+                key={link.url}
+                href={link.url}
+                isExternal
+                w="full"
+                _hover={{ textDecoration: "none" }}
+              >
+                <Card
+                  role="group"
+                  my={{ base: 2, md: 3, lg: 4 }}
+                  w="full"
+                  _hover={{
+                    bg: colorMode === "light" ? "gray.50" : "gray.600",
+                  }}
+                >
+                  {link.image && (
+                    <Img
+                      w="full"
+                      src={link.image}
+                      alt={link.title}
+                      _groupHover={{ opacity: 0.8 }}
+                    />
+                  )}
+                  <Stack px={{ base: 5, sm: 6 }} py={7}>
+                    <Heading as="h4" fontSize="xl" fontFamily="display">
+                      {link.title}
+                    </Heading>
+                    {link.description && (
+                      <Text colorScheme="gray">{link.description}</Text>
+                    )}
+                  </Stack>
+                </Card>
+              </Link>
+            ))}
+          </Box>
+
+          <MotionBox
+            position="absolute"
+            inset={-1}
+            bgGradient="linear-gradient(to top, var(--chakra-colors-gray-800), rgba(39, 39, 42, 0))"
+            zIndex="banner"
+            pointerEvents="none"
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: sectionHeight === "auto" ? 0 : 1,
+            }}
+          />
+        </MotionBox>
+      </LazyMotion>
 
       {sectionHeight !== "auto" && (
         <Flex alignItems="center" justifyContent="center">
