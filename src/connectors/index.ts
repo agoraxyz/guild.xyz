@@ -17,6 +17,7 @@ const supportedChains = [
   "HARMONY",
   "BSC",
   "OPTIMISM",
+  "MOONBEAM",
   "MOONRIVER",
   "METIS",
   "CRONOS",
@@ -38,6 +39,7 @@ enum Chains {
   HARMONY = 1666600000,
   GOERLI = 5,
   OPTIMISM = 10,
+  MOONBEAM = 1284,
   MOONRIVER = 1285,
   RINKEBY = 4,
   METIS = 1088,
@@ -206,6 +208,21 @@ const RPC = {
     blockExplorerUrls: ["https://optimistic.etherscan.io"],
     iconUrls: ["/networkLogos/optimism.svg"],
     rpcUrls: ["https://mainnet.optimism.io"],
+  },
+  MOONBEAM: {
+    chainId: 1285,
+    chainName: "Moonbeam",
+    nativeCurrency: {
+      name: "Moonbeam",
+      symbol: "GLMR",
+      decimals: 18,
+      address: "0x0000000000000000000000000000000000000000", // needed for proper form handling in the TokenFormCard component
+      logoURI:
+        "https://assets.coingecko.com/coins/images/22459/small/glmr.png?1641880985",
+    },
+    blockExplorerUrls: ["https://moonbeam.moonscan.io"],
+    iconUrls: ["/networkLogos/moonbeam.svg"],
+    rpcUrls: ["https://rpc.api.moonbeam.network"],
   },
   MOONRIVER: {
     chainId: 1285,

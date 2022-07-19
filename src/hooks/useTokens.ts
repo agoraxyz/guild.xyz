@@ -30,6 +30,7 @@ const TokenApiURLs = {
     "https://raw.githubusercontent.com/Uniswap/default-token-list/main/src/tokens/goerli.json",
   ],
   OPTIMISM: ["https://static.optimism.io/optimism.tokenlist.json"],
+  MOONBEAM: ["https://tokens.coingecko.com/moonbeam/all.json"],
   MOONRIVER: ["https://tokens.coingecko.com/moonriver/all.json"],
   RINKEBY: [
     "https://raw.githubusercontent.com/Uniswap/default-token-list/main/src/tokens/rinkeby.json",

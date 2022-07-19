@@ -84,6 +84,7 @@ type SupportedChains =
   | "ARBITRUM"
   | "BSC"
   | "OPTIMISM"
+  | "MOONBEAM"
   | "MOONRIVER"
   | "RINKEBY"
   | "METIS"
@@ -427,3 +428,4 @@ export type {
   MonetizePoapForm,
 }
 export { ValidationMethod, RequirementTypeColors }
+
