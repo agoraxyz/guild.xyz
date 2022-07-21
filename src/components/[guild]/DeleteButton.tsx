@@ -1,64 +1,25 @@
-import {
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
-  ButtonProps,
-  Icon,
-  IconButton,
-  Tooltip,
-  useDisclosure,
-} from "@chakra-ui/react"
-import Button from "components/common/Button"
-import { Alert } from "components/common/Modal"
+import { ButtonProps, Icon, IconButton, Tooltip } from "@chakra-ui/react"
 import { Trash } from "phosphor-react"
-import { PropsWithChildren, useRef } from "react"
+import { PropsWithChildren } from "react"
 
 type Props = {
-  title: string
+  label: string
+  onClick: () => void
 } & ButtonProps
 
-const DeleteButton = ({
-  title,
-  children,
-  ...submitButtonProps
-}: PropsWithChildren<Props>): JSX.Element => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const cancelRef = useRef()
-
-  return (
-    <>
-      <Tooltip label={title}>
-        <IconButton
-          aria-label={title}
-          icon={<Icon as={Trash} boxSize="1.1em" weight="bold" />}
-          colorScheme="red"
-          variant={"ghost"}
-          borderRadius={"full"}
-          maxW={10}
-          maxH={10}
-          onClick={onOpen}
-        />
-      </Tooltip>
-      <Alert leastDestructiveRef={cancelRef} {...{ isOpen, onClose }}>
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader>{title}</AlertDialogHeader>
-            <AlertDialogBody>{children}</AlertDialogBody>
-            <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button colorScheme="red" ml={3} {...submitButtonProps}>
-                Delete
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </Alert>
-    </>
-  )
-}
+const DeleteButton = ({ label, onClick }: PropsWithChildren<Props>): JSX.Element => (
+  <Tooltip label={label}>
+    <IconButton
+      aria-label={label}
+      icon={<Icon as={Trash} boxSize="1.1em" weight="bold" />}
+      colorScheme="red"
+      variant={"ghost"}
+      borderRadius={"full"}
+      maxW={10}
+      maxH={10}
+      onClick={onClick}
+    />
+  </Tooltip>
+)
 
 export default DeleteButton

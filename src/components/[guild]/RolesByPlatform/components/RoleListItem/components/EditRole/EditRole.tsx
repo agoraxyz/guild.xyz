@@ -1,6 +1,6 @@
 import {
   Box,
-  Divider,
+  Button,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -14,7 +14,6 @@ import {
   useDisclosure,
   VStack,
 } from "@chakra-ui/react"
-import Button from "components/common/Button"
 import DiscardAlert from "components/common/DiscardAlert"
 import DrawerHeader from "components/common/DrawerHeader"
 import OnboardingMarker from "components/common/OnboardingMarker"
@@ -26,16 +25,17 @@ import Name from "components/create-guild/Name"
 import SetRequirements from "components/create-guild/Requirements"
 import useGuild from "components/[guild]/hooks/useGuild"
 import { useOnboardingContext } from "components/[guild]/Onboarding/components/OnboardingProvider"
+import RolePlatforms from "components/[guild]/RolePlatforms"
+import AddPlatformButton from "components/[guild]/RolePlatforms/components/AddPlatformButton"
 import usePinata from "hooks/usePinata"
 import useSubmitWithUpload from "hooks/useSubmitWithUpload"
 import useWarnIfUnsavedChanges from "hooks/useWarnIfUnsavedChanges"
 import { Check, PencilSimple } from "phosphor-react"
 import { useRef } from "react"
 import { FormProvider, useForm } from "react-hook-form"
-import { PlatformType, Role } from "types"
+import { Role } from "types"
 import getRandomInt from "utils/getRandomInt"
 import mapRequirements from "utils/mapRequirements"
-import ChannelsToGate from "./components/ChannelsToGate"
 import DeleteRoleButton from "./components/DeleteRoleButton"
 import useEditRole from "./hooks/useEditRole"
 
@@ -48,7 +48,7 @@ const EditRole = ({ roleData }: Props): JSX.Element => {
   const drawerSize = useBreakpointValue({ base: "full", md: "xl" })
   const btnRef = useRef()
 
-  const { roles, guildPlatforms } = useGuild()
+  const { roles } = useGuild()
   const { id, name, description, imageUrl, logic, requirements, rolePlatforms } =
     roleData
 
@@ -149,20 +149,17 @@ const EditRole = ({ roleData }: Props): JSX.Element => {
             </DrawerHeader>
             <FormProvider {...methods}>
               <VStack spacing={10} alignItems="start">
-                {guildPlatforms?.[0]?.platformId === PlatformType.DISCORD && (
-                  <>
-                    <Section title="Discord settings" spacing="6">
-                      <ChannelsToGate
-                        isGuardOn={
-                          !!roleData?.rolePlatforms?.[0]?.platformRoleData?.isGuarded
-                        }
-                      />
-                    </Section>
-
-                    <Divider />
-                  </>
-                )}
-
+                <Section
+                  title="Platforms"
+                  spacing="6"
+                  titleRightElement={
+                    <HStack flexGrow={1} justifyContent={"end"}>
+                      <AddPlatformButton />
+                    </HStack>
+                  }
+                >
+                  <RolePlatforms />
+                </Section>
                 <Section title="General" spacing="6">
                   <Box>
                     <FormLabel>Logo and name</FormLabel>

@@ -10,7 +10,7 @@ import preprocessGatedChannels from "utils/preprocessGatedChannels"
 import preprocessRequirements from "utils/preprocessRequirements"
 
 const useEditRole = (roleId: number, onSuccess?: () => void) => {
-  const guild = useGuild()
+  const { urlName } = useGuild()
   const { mutate } = useSWRConfig()
   const toast = useToast()
   const showErrorToast = useShowErrorToast()
@@ -29,7 +29,7 @@ const useEditRole = (roleId: number, onSuccess?: () => void) => {
         status: "success",
       })
       if (onSuccess) onSuccess()
-      mutate([`/guild/${guild?.urlName}`, undefined])
+      mutate([`/guild/${urlName}`, undefined])
     },
     onError: (err) => showErrorToast(err),
   })
@@ -38,12 +38,14 @@ const useEditRole = (roleId: number, onSuccess?: () => void) => {
     ...useSubmitResponse,
     onSubmit: (data) => {
       data.requirements = preprocessRequirements(data?.requirements)
-      if (!!data.rolePlatforms[0]?.platformRoleData) {
-        data.rolePlatforms[0].platformRoleData.gatedChannels =
-          preprocessGatedChannels(
-            data.rolePlatforms?.[0]?.platformRoleData?.gatedChannels
+
+      data.rolePlatforms = data.rolePlatforms.map((rolePlatform) => {
+        if (rolePlatform.platformRoleData?.gatedChannels)
+          rolePlatform.platformRoleData.gatedChannels = preprocessGatedChannels(
+            rolePlatform.platformRoleData.gatedChannels
           )
-      }
+        return rolePlatform
+      })
 
       return useSubmitResponse.onSubmit(JSON.parse(JSON.stringify(data, replacer)))
     },

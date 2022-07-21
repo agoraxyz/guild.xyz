@@ -1,3 +1,3 @@
-import JoinDiscordModal from "./JoinDiscordModal"
+import JoinModal from "./JoinModal"
 
-export default JoinDiscordModal
+export default JoinModal

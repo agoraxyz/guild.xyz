@@ -56,7 +56,7 @@ const RequirementCard = ({
           </Circle>
         </SkeletonCircle>
       </Box>
-      <VStack alignItems="flex-start" alignSelf="center">
+      <VStack alignItems={"flex-start"} alignSelf="center">
         <Text wordBreak="break-word">{children}</Text>
         {footer}
       </VStack>

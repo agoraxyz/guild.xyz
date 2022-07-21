@@ -1,15 +1,18 @@
-import useGuild from "components/[guild]/hooks/useGuild"
+import { useRolePlatform } from "components/[guild]/RolePlatforms/components/RolePlatformProvider"
 import useSWR from "swr"
 
 const useDiscordRoleMemberCounts = (roleIds?: string[]) => {
-  const { guildPlatforms } = useGuild()
-  const serverId = guildPlatforms?.[0]?.platformGuildId
+  const { guildPlatform } = useRolePlatform()
 
-  const shouldFetch = serverId?.length > 0 && Array.isArray(roleIds)
+  const shouldFetch =
+    guildPlatform.platformGuildId?.length > 0 && Array.isArray(roleIds)
 
   const { isValidating, data, error } = useSWR(
     shouldFetch
-      ? [`/discord/memberCount/${serverId}`, { method: "POST", body: { roleIds } }]
+      ? [
+          `/discord/memberCount/${guildPlatform.platformGuildId}`,
+          { method: "POST", body: { roleIds } },
+        ]
       : null
   )
 

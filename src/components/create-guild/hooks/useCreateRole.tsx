@@ -96,17 +96,16 @@ guild.xyz/${router.query.guild} @guildxyz`)}`}
   return {
     ...useSubmitResponse,
     onSubmit: (data) => {
-      // Mapping requirements in order to properly send "interval-like" NFT attribute values to the API
-      data.requirements = preprocessRequirements(data?.requirements || [])
-      data.rolePlatforms[0].platformRoleData.gatedChannels = preprocessGatedChannels(
-        data.rolePlatforms?.[0]?.platformRoleData?.gatedChannels
-      )
+      data.requirements = preprocessRequirements(data?.requirements)
 
-      if (data.roleType === "NEW") {
-        delete data.rolePlatforms[0].rolePlatformId
-        delete data.activationInterval
-        delete data.includeUnauthenticated
-      }
+      data.rolePlatforms = data.rolePlatforms.map((rolePlatform) => {
+        if (rolePlatform.platformRoleData?.gatedChannels)
+          rolePlatform.platformRoleData.gatedChannels = preprocessGatedChannels(
+            rolePlatform.platformRoleData.gatedChannels
+          )
+        return rolePlatform
+      })
+
       delete data.roleType
 
       return useSubmitResponse.onSubmit(JSON.parse(JSON.stringify(data, replacer)))

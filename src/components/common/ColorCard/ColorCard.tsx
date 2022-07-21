@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react"
 import { Rest } from "types"
-import Card from "./Card"
+import Card from "../Card"
 
 type Props = {
   color: string

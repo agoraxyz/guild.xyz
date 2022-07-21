@@ -1,6 +1,5 @@
 import {
   Box,
-  Divider,
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -34,10 +33,14 @@ import { FormProvider, useForm } from "react-hook-form"
 import { PlatformType } from "types"
 import getRandomInt from "utils/getRandomInt"
 import { useOnboardingContext } from "../Onboarding/components/OnboardingProvider"
-import DiscordSettings from "./components/DiscordSettings"
+import RolePlatforms from "../RolePlatforms"
+import AddPlatformButton from "../RolePlatforms/components/AddPlatformButton"
 
 const AddRoleButton = (): JSX.Element => {
-  const { id, guildPlatforms, roles } = useGuild()
+  const { id, guildPlatforms } = useGuild()
+  const discordPlatform = guildPlatforms?.find(
+    (p) => p.platformId === PlatformType.DISCORD
+  )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   const finalFocusRef = useRef(null)
@@ -53,16 +56,16 @@ const AddRoleButton = (): JSX.Element => {
     logic: "AND",
     requirements: [],
     roleType: "NEW",
-    activationInterval: 0,
-    includeUnauthenticated: true,
     imageUrl: `/guildLogos/${getRandomInt(286)}.svg`,
-    rolePlatforms: [
-      {
-        ...roles?.[0]?.rolePlatforms?.[0],
-        platformRoleData: {},
-        platformRoleId: null,
-      },
-    ],
+    rolePlatforms: discordPlatform
+      ? [
+          {
+            guildPlatformId: discordPlatform.id,
+            platformRoleData: {},
+            platformRoleId: null,
+          },
+        ]
+      : [],
   }
 
   const methods = useForm({
@@ -148,15 +151,18 @@ const AddRoleButton = (): JSX.Element => {
 
             <FormProvider {...methods}>
               <VStack spacing={10} alignItems="start">
-                {
-                  // This is solved in rolePlatforms PR
-                  guildPlatforms?.[0]?.platformId === PlatformType.DISCORD && (
-                    <>
-                      <DiscordSettings />
-                      <Divider />
-                    </>
-                  )
-                }
+                <Section
+                  title="Platforms"
+                  spacing="6"
+                  mb={5}
+                  titleRightElement={
+                    <HStack flexGrow={1} justifyContent={"end"}>
+                      <AddPlatformButton />
+                    </HStack>
+                  }
+                >
+                  <RolePlatforms isNewRole={true} />
+                </Section>
 
                 <Section title={"General"} spacing="6">
                   <Box>

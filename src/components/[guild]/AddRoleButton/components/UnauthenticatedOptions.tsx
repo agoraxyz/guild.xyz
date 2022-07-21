@@ -6,6 +6,7 @@ import {
   Wrap,
 } from "@chakra-ui/react"
 import Button from "components/common/Button"
+import { useRolePlatform } from "components/[guild]/RolePlatforms/components/RolePlatformProvider"
 import { PropsWithChildren } from "react"
 import { useController } from "react-hook-form"
 
@@ -54,11 +55,12 @@ const Option = ({ children, ...props }: PropsWithChildren<UseRadioProps>) => {
 }
 
 const UnauthenticatedOptions = () => {
+  const { index } = useRolePlatform()
   const { field: activationIntervalField } = useController({
-    name: "activationInterval",
+    name: `rolePlatforms.${index}.platformRoleData.activationInterval`,
   })
   const { field: includeUnauthenticatedField } = useController({
-    name: "includeUnauthenticated",
+    name: `rolePlatforms.${index}.platformRoleData.includeUnauthenticated`,
   })
 
   const { getRootProps, getRadioProps, value } = useRadioGroup({

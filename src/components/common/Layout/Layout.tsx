@@ -4,7 +4,6 @@ import {
   Heading,
   HStack,
   Text,
-  useBreakpointValue,
   useColorMode,
   VStack,
 } from "@chakra-ui/react"
@@ -41,13 +40,12 @@ const Layout = ({
 }: PropsWithChildren<Props>): JSX.Element => {
   const childrenWrapper = useRef(null)
   const [bgHeight, setBgHeight] = useState("0")
-  const isMobile = useBreakpointValue({ base: true, sm: false })
 
   useIsomorphicLayoutEffect(() => {
     if ((!background && !backgroundImage) || !childrenWrapper?.current) return
 
     const rect = childrenWrapper.current.getBoundingClientRect()
-    setBgHeight(`${rect.top + (window?.scrollY ?? 0) + (isMobile ? 128 : 116)}px`)
+    setBgHeight(`${rect.top + (window?.scrollY ?? 0) + 128}px`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, description, childrenWrapper?.current, action])
 

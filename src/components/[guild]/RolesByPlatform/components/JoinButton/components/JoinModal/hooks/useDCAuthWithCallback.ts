@@ -17,7 +17,7 @@ const useDCAuthWithCallback = (scope: string, callback: () => void) => {
     if (!authorization || !hasClickedAuth) return
 
     callback()
-  }, [authorization, hasClickedAuth, callback])
+  }, [authorization, hasClickedAuth])
 
   return {
     callbackWithDCAuth: handleClick,

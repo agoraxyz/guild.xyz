@@ -5,7 +5,7 @@ import useShowErrorToast from "hooks/useShowErrorToast"
 import { useSubmitWithSign, WithValidation } from "hooks/useSubmit"
 import useToast from "hooks/useToast"
 import { useRouter } from "next/router"
-import { Guild, Requirement } from "types"
+import { Guild, PlatformType, Requirement } from "types"
 import fetcher from "utils/fetcher"
 import replacer from "utils/guildJsonReplacer"
 import preprocessRequirements from "utils/preprocessRequirements"
@@ -59,7 +59,7 @@ const useCreateGuild = () => {
       const data = {
         ...data_,
         // prettier-ignore
-        ...(data_.guildPlatforms?.[0]?.platformName === "TELEGRAM" && data_.requirements?.length && {
+        ...(data_.guildPlatforms?.[0]?.platformId === PlatformType.TELEGRAM && data_.requirements?.length && {
             requirements: undefined,
             roles: [
               {

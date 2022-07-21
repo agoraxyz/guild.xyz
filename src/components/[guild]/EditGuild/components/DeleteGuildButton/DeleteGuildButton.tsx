@@ -1,19 +1,66 @@
-import { Text } from "@chakra-ui/react"
+import {
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  FormLabel,
+  useDisclosure,
+} from "@chakra-ui/react"
+import Button from "components/common/Button"
+import { Alert } from "components/common/Modal"
 import DeleteButton from "components/[guild]/DeleteButton"
+import ShouldKeepPlatformAccesses from "components/[guild]/ShouldKeepPlatformAccesses"
+import { useRef, useState } from "react"
 import useDeleteGuild from "./hooks/useDeleteGuild"
 
 const DeleteGuildButton = (): JSX.Element => {
+  const [removeAccess, setRemoveAccess] = useState(0)
   const { onSubmit, isLoading, signLoadingText } = useDeleteGuild()
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const cancelRef = useRef()
 
   return (
-    <DeleteButton
-      title="Delete guild"
-      isLoading={isLoading}
-      loadingText={signLoadingText || "Deleting"}
-      onClick={() => onSubmit()}
-    >
-      <Text>Are you sure? You can't undo this action afterwards.</Text>
-    </DeleteButton>
+    <>
+      <DeleteButton label="Delete guild" onClick={onOpen} />
+      <Alert
+        leastDestructiveRef={cancelRef}
+        {...{ isOpen, onClose }}
+        size="xl"
+        colorScheme={"dark"}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader>Delete guild</AlertDialogHeader>
+            <AlertDialogBody>
+              <FormLabel mb="3">
+                What to do with existing members on the platforms?
+              </FormLabel>
+              <ShouldKeepPlatformAccesses
+                keepAccessDescription="Everything on the platforms will remain as is for existing members, but accesses by this guild won’t be managed anymore"
+                revokeAccessDescription="Existing members will lose every access granted by this guild"
+                onChange={(newValue) => setRemoveAccess(+newValue)}
+                value={removeAccess}
+              />
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                ml={3}
+                isLoading={isLoading}
+                loadingText={signLoadingText || "Deleting"}
+                onClick={() => onSubmit({ removePlatformAccess: removeAccess })}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </Alert>
+    </>
   )
 }
 

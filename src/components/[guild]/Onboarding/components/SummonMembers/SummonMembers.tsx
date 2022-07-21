@@ -13,6 +13,7 @@ type Props = {
 
 export type SummonMembersForm = {
   channelId: string
+  serverId: string
   title: string
   description: string
   button: string
@@ -50,6 +51,7 @@ const SummonMembers = ({ activeStep, prevStep, nextStep }: Props) => {
         isOpen={isOpen}
         onClose={onClose}
         onSuccess={nextStep}
+        serverId={discordPlatform.platformGuildId}
       />
     </>
   )

@@ -16,7 +16,7 @@ import useSubmitWithUpload from "hooks/useSubmitWithUpload"
 import useWarnIfUnsavedChanges from "hooks/useWarnIfUnsavedChanges"
 import { useContext, useEffect, useState } from "react"
 import { FormProvider, useForm } from "react-hook-form"
-import { GuildFormType } from "types"
+import { GuildFormType, PlatformType } from "types"
 import getRandomInt from "utils/getRandomInt"
 
 const defaultValues: GuildFormType = {
@@ -25,6 +25,7 @@ const defaultValues: GuildFormType = {
   imageUrl: `/guildLogos/${getRandomInt(286)}.svg`,
   guildPlatforms: [
     {
+      platformId: PlatformType.TELEGRAM,
       platformName: "TELEGRAM",
       platformGuildId: "",
     },
@@ -77,7 +78,10 @@ const CreateTelegramGuildPage = (): JSX.Element => {
           <FormProvider {...methods}>
             <ErrorAnimation errors={formErrors}>
               <VStack spacing={10} alignItems="start">
-                <TelegramGroup onUpload={onUpload} />
+                <TelegramGroup
+                  onUpload={onUpload}
+                  fieldName="guildPlatforms.0.platformGuildId"
+                />
 
                 <SetRequirements />
               </VStack>

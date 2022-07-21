@@ -54,8 +54,7 @@ const OptionCard = ({
         <Text
           as="h4"
           isTruncated
-          fontSize={size === "lg" && { md: "lg" }}
-          fontWeight={{ base: size === "lg" ? "extrabold" : "bold", md: "bold" }}
+          fontWeight={size === "lg" ? "extrabold" : "bold"}
           title={title}
         >
           {title}

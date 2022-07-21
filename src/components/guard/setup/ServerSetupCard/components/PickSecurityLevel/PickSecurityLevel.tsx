@@ -21,7 +21,7 @@ const options = [
   },
 ]
 
-const PickSecurityLevel = (): JSX.Element => {
+const PickSecurityLevel = ({ rolePlatformIndex }): JSX.Element => {
   const {
     control,
     formState: { errors },
@@ -29,7 +29,8 @@ const PickSecurityLevel = (): JSX.Element => {
 
   const { field } = useController({
     control,
-    name: "rolePlatforms.0.platformRoleData.grantAccessToExistingUsers",
+    name: `rolePlatforms.${rolePlatformIndex}.platformRoleData.grantAccessToExistingUsers`,
+    defaultValue: 0,
   })
 
   return (
@@ -37,10 +38,9 @@ const PickSecurityLevel = (): JSX.Element => {
       <FormLabel>Security level</FormLabel>
       <RadioSelect
         options={options}
-        name="rolePlatforms.0.platformRoleData.grantAccessToExistingUsers"
+        name={`rolePlatforms.${rolePlatformIndex}.platformRoleData.grantAccessToExistingUsers`}
         onChange={(newValue) => field.onChange(Boolean(+newValue))}
         value={+field.value}
-        defaultValue={0}
         colorScheme="DISCORD"
       />
 

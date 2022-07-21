@@ -3,7 +3,11 @@ import { useMemo } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import Channel from "./Channel"
 
-type Props = { categoryId: string }
+type Props = {
+  rolePlatformIndex: number
+  categoryId: string
+  isGuarded: boolean
+}
 
 export type GatedChannels = Record<
   string,
@@ -13,16 +17,16 @@ export type GatedChannels = Record<
   }
 >
 
-const Category = ({ categoryId }: Props) => {
+const Category = ({ rolePlatformIndex, categoryId, isGuarded }: Props) => {
   const { setValue } = useFormContext()
 
   // TODO: typing
   const name = useWatch({
-    name: `rolePlatforms.0.platformRoleData.gatedChannels.${categoryId}.name`,
+    name: `rolePlatforms.${rolePlatformIndex}.platformRoleData.gatedChannels.${categoryId}.name`,
   })
 
   const channels = useWatch({
-    name: `rolePlatforms.0.platformRoleData.gatedChannels.${categoryId}.channels`,
+    name: `rolePlatforms.${rolePlatformIndex}.platformRoleData.gatedChannels.${categoryId}.channels`,
   })
 
   const sumIsChecked = useMemo(
@@ -40,13 +44,14 @@ const Category = ({ categoryId }: Props) => {
     <>
       {categoryId !== "-" && (
         <Checkbox
-          isChecked={sumIsChecked === channelsLength}
+          isChecked={isGuarded || sumIsChecked === channelsLength}
+          isDisabled={isGuarded}
           isIndeterminate={sumIsChecked > 0 && sumIsChecked < channelsLength}
           onChange={(e) => {
             Object.entries(channels).forEach(
               ([channelId, { name: channelName }]: any) => {
                 setValue(
-                  `rolePlatforms.0.platformRoleData.gatedChannels.${categoryId}.channels.${channelId}`,
+                  `rolePlatforms.${rolePlatformIndex}.platformRoleData.gatedChannels.${categoryId}.channels.${channelId}`,
                   {
                     name: channelName,
                     isChecked: e.target.checked,
@@ -63,7 +68,13 @@ const Category = ({ categoryId }: Props) => {
 
       <Stack pl={categoryId !== "-" ? 6 : 0} mt={1} spacing={1}>
         {Object.keys(channels ?? {}).map((channelId) => (
-          <Channel key={channelId} categoryId={categoryId} channelId={channelId} />
+          <Channel
+            key={channelId}
+            rolePlatformIndex={rolePlatformIndex}
+            categoryId={categoryId}
+            channelId={channelId}
+            isGuarded={isGuarded}
+          />
         ))}
       </Stack>
     </>

@@ -13,6 +13,7 @@ import {
   Stack,
   Text,
   Tooltip,
+  useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react"
 import Button from "components/common/Button"
@@ -20,55 +21,52 @@ import Disclaimer from "components/guard/setup/ServerSetupCard/components/Discla
 import PickSecurityLevel from "components/guard/setup/ServerSetupCard/components/PickSecurityLevel"
 import useGuild from "components/[guild]/hooks/useGuild"
 import SendDiscordJoinButtonModal from "components/[guild]/Onboarding/components/SummonMembers/components/SendDiscordJoinButtonModal"
+import { useRolePlatform } from "components/[guild]/RolePlatforms/components/RolePlatformProvider"
 import useServerData from "hooks/useServerData"
 import { ArrowSquareIn, Info } from "phosphor-react"
-import { useEffect, useMemo } from "react"
-import { useFormContext, useWatch } from "react-hook-form"
+import { useFormContext, useFormState, useWatch } from "react-hook-form"
 import { useSWRConfig } from "swr"
-import { PlatformType } from "types"
 
-type Props = {
-  isOn: boolean
-}
-
-const Guard = ({ isOn }: Props) => {
+const Guard = () => {
+  const { index, guildPlatform } = useRolePlatform()
   const { register, setValue } = useFormContext()
   const { mutate } = useSWRConfig()
-  const { urlName, guildPlatforms } = useGuild()
+  const { urlName } = useGuild()
 
-  const discordPlatform = useMemo(
-    () => guildPlatforms?.find((p) => p.platformId === PlatformType.DISCORD),
-    [guildPlatforms]
-  )
   const {
     data: { channels },
     mutate: mutateChannels,
-  } = useServerData(discordPlatform.platformGuildId)
+  } = useServerData(guildPlatform.platformGuildId)
 
-  const entryChannel = channels.find(
-    (channel) => channel.id === discordPlatform.platformGuildData?.inviteChannel
+  const entryChannel = channels?.find(
+    (channel) => channel.id === guildPlatform?.platformGuildData?.inviteChannel
   )?.name
-  const hasJoinButton = discordPlatform.platformGuildData?.joinButton !== false
+  const hasJoinButton = guildPlatform?.platformGuildData?.joinButton !== false
 
-  const isGuarded = useWatch({ name: "rolePlatforms.0.platformRoleData.isGuarded" })
+  const isGuarded = useWatch({
+    name: `rolePlatforms.${index}.platformRoleData.isGuarded`,
+  })
 
   const { isOpen, onClose, onOpen } = useDisclosure()
 
-  useEffect(() => {
-    if (!isOn && isGuarded) onOpen()
-  }, [isOn, isGuarded])
+  const { dirtyFields } = useFormState()
+
+  const isOn =
+    (isGuarded &&
+      !dirtyFields.rolePlatforms?.[index]?.platformRoleData?.isGuarded) ||
+    (!isGuarded && dirtyFields.rolePlatforms?.[index]?.platformRoleData?.isGuarded)
 
   const handleOpen = () => {
-    setValue("rolePlatforms.0.platformRoleData.isGuarded", true)
+    setValue(`rolePlatforms.${index}.platformRoleData.isGuarded`, true)
     onOpen()
   }
 
   const handleClose = () => {
     onClose()
     if (isOn) return
-    setValue("rolePlatforms.0.platformRoleData.isGuarded", false)
+    setValue(`rolePlatforms.${index}.platformRoleData.isGuarded`, false)
     setValue(
-      "rolePlatforms.0.platformRoleData.grantAccessToExistingUsers",
+      `rolePlatforms.${index}.platformRoleData.grantAccessToExistingUsers`,
       undefined
     )
   }
@@ -79,6 +77,8 @@ const Guard = ({ isOn }: Props) => {
     onClose: onEntryChannelModalClose,
   } = useDisclosure()
 
+  const borderColor = useColorModeValue("gray.200", "whiteAlpha.300")
+
   return (
     <>
       <Checkbox
@@ -86,10 +86,12 @@ const Guard = ({ isOn }: Props) => {
         size="sm"
         spacing={1}
         defaultChecked={isOn}
-        {...register("rolePlatforms.0.platformRoleData.isGuarded")}
+        {...register(`rolePlatforms.${index}.platformRoleData.isGuarded`, {
+          onChange: (e) => !!e.target.checked && onOpen(),
+        })}
         isChecked={isGuarded}
       >
-        <Text as="span" colorScheme={"gray"} d="inline-flex">
+        <Text as="span" colorScheme={"gray"} d="inline-flex" fontWeight={"medium"}>
           Guard whole server
         </Text>
       </Checkbox>
@@ -101,7 +103,12 @@ const Guard = ({ isOn }: Props) => {
         aria-label="Open guard settings"
         ml="2px !important"
       />
-      <Modal isOpen={isOpen} onClose={handleClose} closeOnOverlayClick={!!isOn}>
+      <Modal
+        isOpen={isOpen}
+        onClose={handleClose}
+        closeOnOverlayClick={!!isOn}
+        colorScheme="dark"
+      >
         <ModalOverlay />
         <ModalContent minW={{ base: "auto", md: "3xl" }}>
           <ModalHeader>Guild Guard</ModalHeader>
@@ -133,7 +140,7 @@ const Guard = ({ isOn }: Props) => {
                   py="3"
                   px="5"
                   borderRadius={"xl"}
-                  borderColor="whiteAlpha.300"
+                  borderColor={borderColor}
                   justifyContent={"space-between"}
                   alignItems={{ md: "center" }}
                 >
@@ -151,6 +158,7 @@ const Guard = ({ isOn }: Props) => {
                   </Button>
                 </Stack>
                 <SendDiscordJoinButtonModal
+                  serverId={guildPlatform.platformGuildId}
                   isOpen={isEntryChannelModalOpen}
                   onClose={onEntryChannelModalClose}
                   onSuccess={() => {
@@ -160,7 +168,7 @@ const Guard = ({ isOn }: Props) => {
                   }}
                 />
               </Box>
-              {!isOn && <PickSecurityLevel />}
+              {!isOn && <PickSecurityLevel rolePlatformIndex={index} />}
               <Disclaimer />
             </Stack>
           </ModalBody>
@@ -169,7 +177,11 @@ const Guard = ({ isOn }: Props) => {
               <Button colorScheme="gray" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button colorScheme="green" onClick={onClose}>
+              <Button
+                colorScheme="green"
+                onClick={onClose}
+                isDisabled={!hasJoinButton}
+              >
                 Done
               </Button>
             </HStack>

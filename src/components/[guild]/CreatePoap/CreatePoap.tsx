@@ -53,6 +53,13 @@ type Props = {
   onClose: () => void
 }
 
+type WrapperProps = {
+  isOpen: boolean
+  onOpen: () => void
+  onClose: () => void
+  discordServerId: string
+}
+
 const MotionBox = motion(Box)
 const MotionModalContent = motion(ModalContent)
 
@@ -165,8 +172,13 @@ const CreatePoap = ({ isOpen }: Props): JSX.Element => {
   )
 }
 
-const CreatePoapWrapper = ({ isOpen, onClose, onOpen }: Props): JSX.Element => (
-  <CreatePoapProvider onClose={onClose}>
+const CreatePoapWrapper = ({
+  isOpen,
+  onClose,
+  onOpen,
+  discordServerId,
+}: WrapperProps): JSX.Element => (
+  <CreatePoapProvider onClose={onClose} discordServerId={discordServerId}>
     <CreatePoap {...{ isOpen, onClose, onOpen }} />
   </CreatePoapProvider>
 )

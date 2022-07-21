@@ -4,10 +4,11 @@ import {
   FormErrorMessage,
   FormLabel,
   HStack,
-  Stack,
+  VStack,
 } from "@chakra-ui/react"
 import StyledSelect from "components/common/StyledSelect"
 import useGuild from "components/[guild]/hooks/useGuild"
+import { useRolePlatform } from "components/[guild]/RolePlatforms/components/RolePlatformProvider"
 import useServerData from "hooks/useServerData"
 import { useMemo } from "react"
 import { useController, useFormContext, useFormState } from "react-hook-form"
@@ -19,25 +20,31 @@ import useDiscordRoleMemberCounts from "./hooks/useDiscordRoleMemberCount"
 const ExistingRoleSettings = () => {
   const { errors, dirtyFields } = useFormState()
   const { setValue } = useFormContext()
-  const { guildPlatforms, roles: guildRoles } = useGuild()
+  const { roles: guildRoles } = useGuild()
+  const { guildPlatform, index } = useRolePlatform()
   const {
-    data: { roles },
-  } = useServerData(guildPlatforms?.[0]?.platformGuildId)
+    data: { roles: discordRoles },
+  } = useServerData(guildPlatform.platformGuildId)
 
-  const { memberCounts } = useDiscordRoleMemberCounts(roles?.map((role) => role.id))
+  const { memberCounts } = useDiscordRoleMemberCounts(
+    discordRoles?.map((role) => role.id)
+  )
 
   const {
     field: { name, onBlur, onChange, ref, value },
-  } = useController({ name: "rolePlatforms.0.platformRoleId" })
+  } = useController({ name: `rolePlatforms.${index}.platformRoleId` })
 
   const options = useMemo(() => {
-    if (!memberCounts || !roles || !guildRoles) return undefined
+    if (!memberCounts || !discordRoles || !guildRoles) return undefined
 
-    const notGuildifiedRoles = roles.filter(
-      (discordRole) =>
-        !guildRoles
-          .map((role) => role.rolePlatforms?.[0]?.platformRoleId)
-          .includes(discordRole.id)
+    const guildifiedRoleIds = guildRoles.map(
+      (role) =>
+        role.rolePlatforms?.find(
+          (platform) => platform.guildPlatformId === guildPlatform.id
+        )?.platformRoleId
+    )
+    const notGuildifiedRoles = discordRoles.filter(
+      (discordRole) => !guildifiedRoleIds.includes(discordRole.id)
     )
 
     return notGuildifiedRoles.map((role) => ({
@@ -48,11 +55,11 @@ const ExistingRoleSettings = () => {
           ? "Failed to count members"
           : pluralize(memberCounts[role.id], "member"),
     }))
-  }, [roles, memberCounts])
+  }, [discordRoles, memberCounts])
 
   return (
-    <Stack direction={{ base: "column", md: "row" }} px="5" py="4" spacing="6">
-      <FormControl isDisabled={!roles?.length}>
+    <VStack px="5" py="4" spacing="6">
+      <FormControl isDisabled={!discordRoles?.length}>
         <HStack mb={2} alignItems="center">
           <FormLabel m={0}>Select role</FormLabel>
         </HStack>
@@ -74,7 +81,7 @@ const ExistingRoleSettings = () => {
           />
         </Box>
         <FormErrorMessage>
-          {errors.rolePlatforms?.[0]?.platformRoleId?.message}
+          {errors.rolePlatforms?.[index]?.platformRoleId?.message}
         </FormErrorMessage>
       </FormControl>
 
@@ -84,7 +91,7 @@ const ExistingRoleSettings = () => {
         </FormLabel>
         <UnauthenticatedOptions />
       </FormControl>
-    </Stack>
+    </VStack>
   )
 }
 

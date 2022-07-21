@@ -13,7 +13,7 @@ type Option = PropsWithChildren<{
   title: string
   description?: string
   icon?: React.FC
-  disabled?: boolean
+  disabled?: string
 }>
 
 type Props = {

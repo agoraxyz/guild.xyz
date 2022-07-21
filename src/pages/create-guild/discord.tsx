@@ -57,7 +57,10 @@ const CreateDiscordGuildPage = (): JSX.Element => {
   return (
     <Layout title="Create Guild on Discord">
       <FormProvider {...methods}>
-        <DiscordGuildSetup {...{ defaultValues, selectedServer }}>
+        <DiscordGuildSetup
+          {...{ defaultValues, selectedServer }}
+          fieldName="guildPlatforms.0.platformGuildId"
+        >
           <DiscordRoleVideo />
         </DiscordGuildSetup>
 

@@ -21,7 +21,7 @@ import getRandomInt from "utils/getRandomInt"
 
 const MotionStack = motion(Stack)
 
-const ServerSetupCard = ({ children }): JSX.Element => {
+const ServerSetupCard = ({ children, onSubmit: onSubmitProp }): JSX.Element => {
   const addDatadogAction = useRumAction("trackingAppAction")
   const addDatadogError = useRumError()
 
@@ -131,7 +131,14 @@ const ServerSetupCard = ({ children }): JSX.Element => {
             ) : (
               <>
                 <Box />
-                <Button colorScheme="green" onClick={() => setWatchedVideo(true)}>
+                <Button
+                  colorScheme="green"
+                  onClick={() => {
+                    onSubmitProp?.()
+                    if (onSubmitProp) return
+                    setWatchedVideo(true)
+                  }}
+                >
                   Got it
                 </Button>
               </>

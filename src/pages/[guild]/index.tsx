@@ -1,9 +1,10 @@
-import { HStack, Spinner, Stack, Tag, useBreakpointValue } from "@chakra-ui/react"
+import { Collapse, Spinner, Tag, useBreakpointValue } from "@chakra-ui/react"
 import { WithRumComponentContext } from "@datadog/rum-react-integration"
 import GuildLogo from "components/common/GuildLogo"
 import Layout from "components/common/Layout"
 import LinkPreviewHead from "components/common/LinkPreviewHead"
 import Section from "components/common/Section"
+import AccessHub from "components/[guild]/AccessHub"
 import useGuild from "components/[guild]/hooks/useGuild"
 import useGuildPermission from "components/[guild]/hooks/useGuildPermission"
 import LeaveButton from "components/[guild]/LeaveButton"
@@ -56,7 +57,7 @@ const GuildPage = (): JSX.Element => {
     return accessedRoles.concat(otherRoles)
   }, [roles, roleAccesses])
 
-  const [DynamicGuildMenu, setDynamicGuildMenu] = useState(null)
+  const [DynamicEditGuildButton, setDynamicEditGuildButton] = useState(null)
   const [DynamicAddRoleButton, setDynamicAddRoleButton] = useState(null)
   const [DynamicOnboarding, setDynamicOnboarding] = useState(null)
 
@@ -70,14 +71,16 @@ const GuildPage = (): JSX.Element => {
 
   useEffect(() => {
     if (isAdmin) {
-      const GuildMenu = dynamic(() => import("components/[guild]/GuildMenu"))
+      const EditGuildButton = dynamic(
+        () => import("components/[guild]/EditGuildButton")
+      )
       const AddRoleButton = dynamic(() => import("components/[guild]/AddRoleButton"))
-      setDynamicGuildMenu(GuildMenu)
+      setDynamicEditGuildButton(EditGuildButton)
       setDynamicAddRoleButton(AddRoleButton)
 
       if (
         !onboardingComplete &&
-        guildPlatforms?.[0]?.platformId === PlatformType.DISCORD
+        guildPlatforms?.some((p) => p.platformId === PlatformType.DISCORD)
       ) {
         const Onboarding = dynamic(() => import("components/[guild]/Onboarding"))
         setDynamicOnboarding(Onboarding)
@@ -89,6 +92,8 @@ const GuildPage = (): JSX.Element => {
   const DynamicOnboardingProvider = DynamicOnboarding
     ? OnboardingProvider
     : React.Fragment
+
+  const showAccessHub = (isMember || isOwner) && !DynamicOnboarding
 
   return (
     <DynamicOnboardingProvider>
@@ -108,54 +113,50 @@ const GuildPage = (): JSX.Element => {
         }
         background={localThemeColor}
         backgroundImage={localBackgroundImage}
-        action={DynamicGuildMenu && <DynamicGuildMenu />}
+        action={DynamicEditGuildButton && <DynamicEditGuildButton />}
       >
         {DynamicOnboarding && <DynamicOnboarding />}
 
-        <Tabs>
-          <HStack>
+        <Tabs tabTitle={showAccessHub ? "Home" : "Roles"}>
+          {DynamicAddRoleButton && isMember ? (
+            <DynamicAddRoleButton />
+          ) : isMember ? (
+            <LeaveButton />
+          ) : (
             <JoinButton platform={guildPlatforms?.[0]?.platformId} />
-            {
-              guildPlatforms?.[0]?.platformId !== PlatformType.TELEGRAM &&
-              DynamicAddRoleButton &&
-              isMember ? (
-                <DynamicAddRoleButton />
-              ) : isMember ? (
-                <LeaveButton />
-              ) : null
-              // <JoinButton platform={guildPlatforms?.[0]?.platformId} />
-            }
-          </HStack>
+          )}
         </Tabs>
 
-        <Stack spacing={12}>
-          <Stack spacing={4}>
-            <AnimateSharedLayout>
-              {sortedRoles?.map((role) => (
-                <RoleCard key={role.id} role={role} />
-              ))}
-            </AnimateSharedLayout>
-          </Stack>
+        <Collapse in={showAccessHub} unmountOnExit>
+          <AccessHub />
+        </Collapse>
 
-          {showMembers && (
-            <>
-              <Section
-                title="Members"
-                titleRightElement={
-                  <Tag size="sm">
-                    {isLoading ? (
-                      <Spinner size="xs" />
-                    ) : (
-                      members?.filter((address) => !!address)?.length ?? 0
-                    )}
-                  </Tag>
-                }
-              >
-                <Members isLoading={isLoading} admins={admins} members={members} />
-              </Section>
-            </>
-          )}
-        </Stack>
+        <Section title={showAccessHub && "Roles"} spacing={4} mb="12">
+          <AnimateSharedLayout>
+            {sortedRoles?.map((role) => (
+              <RoleCard key={role.id} role={role} />
+            ))}
+          </AnimateSharedLayout>
+        </Section>
+
+        {showMembers && (
+          <>
+            <Section
+              title="Members"
+              titleRightElement={
+                <Tag size="sm">
+                  {isLoading ? (
+                    <Spinner size="xs" />
+                  ) : (
+                    members?.filter((address) => !!address)?.length ?? 0
+                  )}
+                </Tag>
+              }
+            >
+              <Members isLoading={isLoading} admins={admins} members={members} />
+            </Section>
+          </>
+        )}
       </Layout>
     </DynamicOnboardingProvider>
   )

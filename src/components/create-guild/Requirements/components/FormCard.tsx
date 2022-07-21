@@ -1,10 +1,10 @@
 import { CloseButton, HStack, Spinner, Text, VStack } from "@chakra-ui/react"
 import CardMotionWrapper from "components/common/CardMotionWrapper"
 import ColorCard from "components/common/ColorCard"
+import ColorCardLabel from "components/common/ColorCard/ColorCardLabel"
 import { PropsWithChildren } from "react"
 import { RequirementType, RequirementTypeColors } from "types"
 import useBalancy from "../hooks/useBalancy"
-import RequirementChainTypeText from "./RequirementChainTypeText"
 
 type Props = {
   index: number
@@ -37,8 +37,11 @@ const FormCard = ({
         <VStack spacing={4} alignItems="start" pt={4} h="full">
           {children}
         </VStack>
-        <RequirementChainTypeText
-          requirementType={type}
+        <ColorCardLabel
+          type={type}
+          typeBackgroundColors={RequirementTypeColors}
+          typeLabel={{ ERC1155: "NFT", ERC721: "NFT" }}
+          typeColors={{ ALLOWLIST: "gray.700" }}
           top={"-px"}
           left={"-px"}
           borderTopLeftRadius="2xl"

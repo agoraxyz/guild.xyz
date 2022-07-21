@@ -8,18 +8,19 @@ import getRandomInt from "utils/getRandomInt"
 const useSetImageAndNameFromPlatformData = (
   platformImage: string,
   platformName: string,
-  onUpload: Uploader["onUpload"]
+  onUpload?: Uploader["onUpload"]
 ) => {
   const { setValue } = useFormContext()
   const { touchedFields } = useFormState()
 
   useEffect(() => {
-    if (!(platformName?.length > 0) || !!touchedFields.name) return
+    if (!(platformName?.length > 0) || !!touchedFields.name || !onUpload) return
 
     setValue("name", platformName)
   }, [platformName])
 
   useEffect(() => {
+    if (!onUpload) return
     if (!(platformImage?.length > 0) || !!touchedFields.imageUrl) {
       setValue("imageUrl", `/guildLogos/${getRandomInt(286)}.svg`)
       return

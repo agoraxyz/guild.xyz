@@ -1,4 +1,4 @@
-import { GatedChannels } from "components/[guild]/RolesByPlatform/components/RoleListItem/components/EditRole/components/ChannelsToGate/components/Category"
+import { GatedChannels } from "components/[guild]/RolePlatforms/components/PlatformCard/components/DiscordCard/components/ChannelsToGate/components/Category"
 
 const preprocessGatedChannels = (gatedChannels: GatedChannels) => {
   const gatedChannelEntries = Object.entries(gatedChannels ?? {})

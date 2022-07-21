@@ -1,6 +1,17 @@
-import { Checkbox, Text } from "@chakra-ui/react"
+import {
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  FormLabel,
+  useDisclosure,
+} from "@chakra-ui/react"
+import Button from "components/common/Button"
+import { Alert } from "components/common/Modal"
 import DeleteButton from "components/[guild]/DeleteButton"
-import { useState } from "react"
+import ShouldKeepPlatformAccesses from "components/[guild]/ShouldKeepPlatformAccesses"
+import { useRef, useState } from "react"
 import useDeleteRole from "./hooks/useDeleteRole"
 
 type Props = {
@@ -8,30 +19,52 @@ type Props = {
 }
 
 const DeleteRoleButton = ({ roleId }: Props): JSX.Element => {
-  const [keepDC, setKeepDC] = useState(false)
+  const [removeAccess, setRemoveAccess] = useState(0)
   const { onSubmit, isLoading, signLoadingText } = useDeleteRole(roleId)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const cancelRef = useRef()
 
   return (
-    <DeleteButton
-      title="Delete role"
-      isLoading={isLoading}
-      loadingText={signLoadingText || "Deleting"}
-      onClick={() => onSubmit({ deleteFromDiscord: !keepDC })}
-    >
-      <Text>Are you sure? You can't undo this action afterwards.</Text>
-      <Checkbox
-        mt="6"
-        colorScheme="primary"
-        isChecked={keepDC}
-        onChange={(e) => setKeepDC(e.target.checked)}
+    <>
+      <DeleteButton label="Delete role" onClick={onOpen} />
+      <Alert
+        leastDestructiveRef={cancelRef}
+        {...{ isOpen, onClose }}
+        size="xl"
+        colorScheme={"dark"}
       >
-        Keep role on Discord
-      </Checkbox>
-      <Text ml="6" mt="1" colorScheme="gray">
-        This way it'll remain as is for the existing members, but won't be managed
-        anymore
-      </Text>
-    </DeleteButton>
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader>Delete role</AlertDialogHeader>
+            <AlertDialogBody>
+              <FormLabel mb="3">
+                What to do with existing members on the platforms?
+              </FormLabel>
+              <ShouldKeepPlatformAccesses
+                keepAccessDescription="Everything on the platforms will remain as is for existing members, but accesses by this role won’t be managed anymore"
+                revokeAccessDescription="Existing members will lose every access granted by this role"
+                onChange={(newValue) => setRemoveAccess(+newValue)}
+                value={removeAccess}
+              />
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                ml={3}
+                isLoading={isLoading}
+                loadingText={signLoadingText || "Deleting"}
+                onClick={() => onSubmit({ removePlatformAccess: removeAccess })}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </Alert>
+    </>
   )
 }
 

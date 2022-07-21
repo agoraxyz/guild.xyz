@@ -3,6 +3,7 @@ import {
   Collapse,
   Flex,
   Heading,
+  HStack,
   Icon,
   Tag,
   Text,
@@ -86,9 +87,9 @@ const RadioOption = (props) => {
       }}
       _active={{ bg: null }}
     >
-      <Flex as="label" py="4" px="5" cursor="pointer" alignItems="center">
+      <HStack as="label" py="4" px="5" cursor="pointer" spacing={4}>
         <input {...input} />
-        <Box whiteSpace="break-spaces" w="full">
+        <Box whiteSpace="break-spaces" w="full" ml="0 !important">
           <Heading size="sm">{title}</Heading>
           {description && (
             <Text fontWeight="normal" colorScheme="gray" mt="1">
@@ -96,8 +97,8 @@ const RadioOption = (props) => {
             </Text>
           )}
         </Box>
-        {icon && <Icon as={icon} width="1.2em" height="1.2em" ml="6" />}
-      </Flex>
+        {icon && <Icon as={icon} width="1.2em" height="1.2em" />}
+      </HStack>
       {children && <Collapse in={isChecked}>{children}</Collapse>}
     </Button>
   )

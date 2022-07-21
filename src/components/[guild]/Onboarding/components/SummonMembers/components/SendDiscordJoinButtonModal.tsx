@@ -24,7 +24,7 @@ import { SummonMembersForm } from "../SummonMembers"
 import PanelBody from "./PanelBody"
 import PanelButton from "./PanelButton"
 
-const SendDiscordJoinButtonModal = ({ isOpen, onClose, onSuccess }) => {
+const SendDiscordJoinButtonModal = ({ isOpen, onClose, onSuccess, serverId }) => {
   const addDatadogAction = useRumAction("trackingAppAction")
   const { isLoading, isSigning, onSubmit, signLoadingText } = useSendJoin(
     "JOIN",
@@ -33,10 +33,10 @@ const SendDiscordJoinButtonModal = ({ isOpen, onClose, onSuccess }) => {
 
   const loadingText = signLoadingText || "Sending"
 
-  const { guildPlatforms, description, name } = useGuild()
+  const { description, name } = useGuild()
   const {
     data: { channels },
-  } = useServerData(guildPlatforms?.[0]?.platformGuildId)
+  } = useServerData(serverId)
 
   const methods = useForm<SummonMembersForm>({
     mode: "onSubmit",
@@ -45,6 +45,7 @@ const SendDiscordJoinButtonModal = ({ isOpen, onClose, onSuccess }) => {
       description: description || "Join this guild and get your role(s)!",
       button: `Join ${name ?? "Guild"}`,
       channelId: "0",
+      serverId,
     },
   })
 

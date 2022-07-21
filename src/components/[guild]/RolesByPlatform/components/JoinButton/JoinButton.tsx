@@ -12,10 +12,7 @@ import { useEffect } from "react"
 import { PlatformType } from "types"
 import useAccess from "../../hooks/useAccess"
 import useJoinSuccessToast from "./components/JoinModal/hooks/useJoinSuccessToast"
-import JoinDiscordModal from "./components/JoinModal/JoinDiscordModal"
 import JoinModal from "./components/JoinModal/JoinModal"
-import JoinTelegramModal from "./components/JoinModal/JoinTelegramModal"
-import useIsMember from "./hooks/useIsMember"
 
 type Props = {
   platform: PlatformType
@@ -27,7 +24,6 @@ const JoinButton = ({ platform }: Props): JSX.Element => {
   const { isActive } = useWeb3React()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const isMember = useIsMember()
   const { hasAccess, isLoading } = useAccess()
 
   useJoinSuccessToast(onClose, platform)
@@ -97,15 +93,9 @@ const JoinButton = ({ platform }: Props): JSX.Element => {
         colorScheme="green"
         data-dd-action-name="Join"
       >
-        {isMember ? "View invite link" : buttonText}
+        {buttonText}
       </Button>
-      {platform === PlatformType.TELEGRAM ? (
-        <JoinTelegramModal {...{ isOpen, onClose }} />
-      ) : platform === PlatformType.DISCORD ? (
-        <JoinDiscordModal {...{ isOpen, onClose }} />
-      ) : (
-        <JoinModal {...{ isOpen, onClose }} />
-      )}
+      <JoinModal {...{ isOpen, onClose }} />
     </Box>
   )
 }

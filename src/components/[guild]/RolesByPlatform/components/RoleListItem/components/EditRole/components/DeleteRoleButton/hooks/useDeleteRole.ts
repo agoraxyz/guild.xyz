@@ -7,7 +7,7 @@ import { useSWRConfig } from "swr"
 import fetcher from "utils/fetcher"
 
 type Data = {
-  deleteFromDiscord?: boolean
+  removePlatformAccess?: number
 }
 
 const useDeleteRole = (roleId: number) => {

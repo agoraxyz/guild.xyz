@@ -8,10 +8,15 @@ import { AnimatePresence, AnimateSharedLayout } from "framer-motion"
 import useUsersServers from "hooks/useUsersServers"
 import { useEffect, useMemo, useState } from "react"
 import { useFormContext } from "react-hook-form"
-import { GuildFormType } from "types"
 
-const DiscordGuildSetup = ({ defaultValues, selectedServer, children }) => {
-  const { reset, setValue } = useFormContext<GuildFormType>()
+const DiscordGuildSetup = ({
+  defaultValues,
+  selectedServer,
+  fieldName,
+  children,
+  onSubmit = undefined,
+}) => {
+  const { reset, setValue } = useFormContext()
 
   const { authorization } = useDCAuth("guilds")
 
@@ -34,7 +39,7 @@ const DiscordGuildSetup = ({ defaultValues, selectedServer, children }) => {
 
   const resetForm = () => {
     reset(defaultValues)
-    setValue("guildPlatforms.0.platformGuildId", null)
+    setValue(fieldName, null)
   }
 
   if (((!servers || servers.length <= 0) && isValidating) || !authorization) {
@@ -65,8 +70,7 @@ const DiscordGuildSetup = ({ defaultValues, selectedServer, children }) => {
                     onSelect={
                       selectedServer
                         ? undefined
-                        : (newServerId) =>
-                            setValue("guildPlatforms.0.platformGuildId", newServerId)
+                        : (newServerId) => setValue(fieldName, newServerId)
                     }
                     onCancel={
                       selectedServer !== serverData.id
@@ -81,7 +85,7 @@ const DiscordGuildSetup = ({ defaultValues, selectedServer, children }) => {
 
           {showForm && (
             <GridItem colSpan={2}>
-              <ServerSetupCard>{children}</ServerSetupCard>
+              <ServerSetupCard onSubmit={onSubmit}>{children}</ServerSetupCard>
             </GridItem>
           )}
         </AnimatePresence>

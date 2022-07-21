@@ -185,7 +185,10 @@ type Requirement = {
 
 type RolePlatform = {
   platformRoleId?: string
-  guildPlatformId: number
+  guildPlatformId?: number
+  guildPlatform?: Platform
+  index?: number
+  isNewRole?: boolean
   platformRoleData?: PlatformRoleData[keyof PlatformRoleData]
 }
 
@@ -204,6 +207,7 @@ type Role = {
 type Platform = {
   id: number
   platformId: PlatformType
+  platformName?: PlatformName
   platformGuildId: string
   platformGuildData?: PlatformGuildData[keyof PlatformGuildData]
   invite?: string
@@ -414,6 +418,7 @@ export type {
   SnapshotStrategy,
   JuiceboxProject,
   MirrorEdition,
+  RolePlatform,
   ThemeMode,
   Logic,
   PlatformAccountDetails,

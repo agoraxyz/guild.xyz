@@ -10,7 +10,11 @@ import useGuild from "../hooks/useGuild"
 import { useThemeContext } from "../ThemeContext"
 import TabButton from "./components/TabButton"
 
-const Tabs = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
+type Props = {
+  tabTitle: string
+}
+
+const Tabs = ({ tabTitle, children }: PropsWithChildren<Props>): JSX.Element => {
   const tabsRef = useRef()
   const [isSticky, setIsSticky] = useState(false)
   const { colorMode } = useColorMode()
@@ -44,7 +48,7 @@ const Tabs = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
       top={0}
       py={3}
       mt={-3}
-      mb={3}
+      mb={2}
       width="full"
       zIndex={isSticky ? "banner" : "auto"}
       _before={{
@@ -82,7 +86,7 @@ const Tabs = ({ children }: PropsWithChildren<unknown>): JSX.Element => {
             scrollbarWidth: "none",
           }}
         >
-          <TabButton href={`${urlName}`}>Roles</TabButton>
+          <TabButton href={`${urlName}`}>{tabTitle}</TabButton>
           {/* <TabButton href="#" disabled tooltipText="Stay tuned!">
             More tabs soon
           </TabButton> */}
