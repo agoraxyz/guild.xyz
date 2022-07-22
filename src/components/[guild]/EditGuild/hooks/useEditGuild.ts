@@ -40,7 +40,7 @@ const useEditGuild = ({ onSuccess, guildId }: Props = {}) => {
         status: "success",
       })
       if (onSuccess) onSuccess()
-      mutate([`/guild/${guild?.urlName}`, undefined])
+      mutate([`/guild/details/${guild?.urlName}`, { method: "POST", body: {} }])
 
       matchMutate(/^\/guild\/address\//)
       matchMutate(/^\/guild\?order/)

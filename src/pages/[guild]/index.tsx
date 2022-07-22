@@ -1,4 +1,4 @@
-import { HStack, Spinner, Stack, Tag, useBreakpointValue } from "@chakra-ui/react"
+import { Spinner, Stack, Tag, useBreakpointValue } from "@chakra-ui/react"
 import { WithRumComponentContext } from "@datadog/rum-react-integration"
 import GuildLogo from "components/common/GuildLogo"
 import Layout from "components/common/Layout"
@@ -113,19 +113,15 @@ const GuildPage = (): JSX.Element => {
         {DynamicOnboarding && <DynamicOnboarding />}
 
         <Tabs>
-          <HStack>
+          {guildPlatforms?.[0]?.platformId !== PlatformType.TELEGRAM &&
+          DynamicAddRoleButton &&
+          isMember ? (
+            <DynamicAddRoleButton />
+          ) : isMember ? (
+            <LeaveButton />
+          ) : (
             <JoinButton platform={guildPlatforms?.[0]?.platformId} />
-            {
-              guildPlatforms?.[0]?.platformId !== PlatformType.TELEGRAM &&
-              DynamicAddRoleButton &&
-              isMember ? (
-                <DynamicAddRoleButton />
-              ) : isMember ? (
-                <LeaveButton />
-              ) : null
-              // <JoinButton platform={guildPlatforms?.[0]?.platformId} />
-            }
-          </HStack>
+          )}
         </Tabs>
 
         <Stack spacing={12}>
@@ -207,7 +203,11 @@ const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       fallback: {
-        [unstable_serialize([endpoint, undefined])]: dataWithoutMembers,
+        [endpoint]: dataWithoutMembers,
+        [unstable_serialize([
+          `/guild/details/${params.guild?.toString()}`,
+          { method: "POST", body: {} },
+        ])]: dataWithoutMembers,
       },
     },
     revalidate: 10,

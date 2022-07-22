@@ -43,6 +43,7 @@ const useDeleteGuild = () => {
       router.push("/explorer")
     },
     onError: (error) => showErrorToast(error),
+    forcePrompt: true,
   })
 }
 

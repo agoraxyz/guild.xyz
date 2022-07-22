@@ -29,7 +29,7 @@ const useEditRole = (roleId: number, onSuccess?: () => void) => {
         status: "success",
       })
       if (onSuccess) onSuccess()
-      mutate([`/guild/${guild?.urlName}`, undefined])
+      mutate([`/guild/details/${guild?.urlName}`, { method: "POST", body: {} }])
     },
     onError: (err) => showErrorToast(err),
   })
@@ -38,7 +38,7 @@ const useEditRole = (roleId: number, onSuccess?: () => void) => {
     ...useSubmitResponse,
     onSubmit: (data) => {
       data.requirements = preprocessRequirements(data?.requirements)
-      if (!!data.rolePlatforms[0]?.platformRoleData) {
+      if (!!data.rolePlatforms?.[0]?.platformRoleData) {
         data.rolePlatforms[0].platformRoleData.gatedChannels =
           preprocessGatedChannels(
             data.rolePlatforms?.[0]?.platformRoleData?.gatedChannels

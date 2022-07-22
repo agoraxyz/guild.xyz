@@ -10,7 +10,7 @@ import useToast from "hooks/useToast"
 import { useRouter } from "next/router"
 import { TwitterLogo } from "phosphor-react"
 import { useRef } from "react"
-import { unstable_serialize, useSWRConfig } from "swr"
+import { useSWRConfig } from "swr"
 import { Role } from "types"
 import fetcher from "utils/fetcher"
 import replacer from "utils/guildJsonReplacer"
@@ -80,12 +80,10 @@ guild.xyz/${router.query.guild} @guildxyz`)}`}
           status: "success",
         })
       }
-      mutate(
-        unstable_serialize([
-          `/guild/${router.query.guild ?? response_.guildId}`,
-          undefined,
-        ])
-      )
+      mutate([
+        `/guild/details/${router.query.guild ?? response_.guildId}`,
+        { method: "POST", body: {} },
+      ])
       mutate(`/guild/access/${response_.guildId}/${account}`)
 
       matchMutate(/^\/guild\/address\//)

@@ -1,7 +1,8 @@
 import { Contract } from "@ethersproject/contracts"
 import { hashMessage } from "@ethersproject/hash"
 
-import { Web3Provider } from "@ethersproject/providers"
+import { JsonRpcProvider } from "@ethersproject/providers"
+import { Chains, RPC } from "connectors"
 // import EIP1271_ABI from "static/abis/EIP1271.json"
 import GNOSIS_SAFE_L2_ABI from "static/abis/gnosisSafeL2.json"
 import GNOSIS_SIGN_MESSAGE_LIB_ABI from "static/abis/gnosisSignMessageLib.json"
@@ -12,15 +13,16 @@ import GNOSIS_SIGN_MESSAGE_LIB_ABI from "static/abis/gnosisSignMessageLib.json"
 export type MethodSignCallback = (
   message: string,
   address: string,
-  provider: Web3Provider
+  chainId: number
 ) => Promise<void>
 
 const gnosisSafeSignCallback: MethodSignCallback = async (
   message: string,
   address: string,
-  provider: Web3Provider
+  chainId: number
 ) => {
   try {
+    const rpcProvider = new JsonRpcProvider(RPC[Chains[chainId]].rpcUrls[0])
     /**
      * Calling using sign lib abi here instead of the safe's, because the call gets
      * forwarded to the lib by the safe contract. This seems to be the only way, we
@@ -29,10 +31,9 @@ const gnosisSafeSignCallback: MethodSignCallback = async (
     const signLibContract = new Contract(
       address,
       GNOSIS_SIGN_MESSAGE_LIB_ABI,
-      provider
+      rpcProvider
     )
-    const safeContract = new Contract(address, GNOSIS_SAFE_L2_ABI, provider)
-
+    const safeContract = new Contract(address, GNOSIS_SAFE_L2_ABI, rpcProvider)
     const msgHash = await signLibContract.getMessageHash(hashMessage(message))
 
     /** This message gets emitted when the sign transaction is finalized, we must await it here */

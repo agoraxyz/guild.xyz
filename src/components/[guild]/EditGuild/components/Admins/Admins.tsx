@@ -1,5 +1,4 @@
 import {
-  Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -10,7 +9,6 @@ import { useWeb3React } from "@web3-react/core"
 import GuildAvatar from "components/common/GuildAvatar"
 import useGuild from "components/[guild]/hooks/useGuild"
 import useGuildMembers from "hooks/useGuildMembers"
-import { LockSimple } from "phosphor-react"
 import { useMemo } from "react"
 import { useController, useFormContext } from "react-hook-form"
 import useSWR from "swr"
@@ -37,15 +35,7 @@ const fetchMemberOptions = (_: string, members: string[], provider: Web3Provider
 
 const Admins = () => {
   const { formState } = useFormContext()
-  const {
-    admins: guildAdmins,
-    fetchAsOwner,
-    fetchedAsOwner,
-    showMembers,
-    isSigning,
-    isLoading: isGuildLoading,
-    signLoadingText,
-  } = useGuild()
+  const { admins: guildAdmins } = useGuild()
   const ownerAddress = useMemo(
     () => guildAdmins?.find((admin) => admin.isOwner)?.address,
     [guildAdmins]
@@ -100,61 +90,43 @@ const Admins = () => {
 
   const isLoading = !guildAdmins || !options || !adminOptions || !memberOptions
 
-  const loadingText =
-    signLoadingText || (isGuildLoading && "Loading admins") || "Loading"
-
   return (
     <>
       <FormControl w="full" isInvalid={!!formState.errors.admins}>
         <FormLabel>Admins</FormLabel>
 
-        {!showMembers && !fetchedAsOwner ? (
-          <Button
-            onClick={fetchAsOwner}
-            isLoading={isSigning || isGuildLoading}
-            loadingText={loadingText}
-            spinnerPlacement="end"
-            rightIcon={<LockSimple />}
-            variant="outline"
-            w="full"
-            justifyContent={"space-between"}
-          >
-            Sign to view admins
-          </Button>
-        ) : (
-          <AdminSelect
-            placeholder={!isLoading && "Add address or search members"}
-            name="admins"
-            ref={(el) => {
-              ref(el)
-              if (!el?.inputRef) return
-              setTimeout(() => {
-                el.inputRef?.addEventListener("paste", (event) => {
-                  const pastedData = event.clipboardData
-                    .getData("text")
-                    ?.trim()
-                    ?.toLowerCase()
+        <AdminSelect
+          placeholder={!isLoading && "Add address or search members"}
+          name="admins"
+          ref={(el) => {
+            ref(el)
+            if (!el?.inputRef) return
+            setTimeout(() => {
+              el.inputRef?.addEventListener("paste", (event) => {
+                const pastedData = event.clipboardData
+                  .getData("text")
+                  ?.trim()
+                  ?.toLowerCase()
 
-                  if (!ADDRESS_REGEX.test(pastedData)) return
-                  event.preventDefault()
-                  if (admins.includes(pastedData)) return
-                  onChange([...admins, pastedData])
-                  el.inputRef.focus()
-                })
-              }, 100)
-            }}
-            value={adminOptions}
-            isMulti
-            options={memberOptions ?? prevMemberOptions}
-            onBlur={onBlur}
-            onChange={(selectedOption: SelectOption[]) => {
-              onChange(selectedOption?.map((option) => option.value.toLowerCase()))
-            }}
-            isLoading={isLoading}
-            isClearable={false}
-            chakraStyles={{ valueContainer: (base) => ({ ...base, py: 2 }) }}
-          />
-        )}
+                if (!ADDRESS_REGEX.test(pastedData)) return
+                event.preventDefault()
+                if (admins.includes(pastedData)) return
+                onChange([...admins, pastedData])
+                el.inputRef.focus()
+              })
+            }, 100)
+          }}
+          value={adminOptions}
+          isMulti
+          options={memberOptions ?? prevMemberOptions}
+          onBlur={onBlur}
+          onChange={(selectedOption: SelectOption[]) => {
+            onChange(selectedOption?.map((option) => option.value.toLowerCase()))
+          }}
+          isLoading={isLoading}
+          isClearable={false}
+          chakraStyles={{ valueContainer: (base) => ({ ...base, py: 2 }) }}
+        />
 
         <FormErrorMessage>{formState.errors.admins?.message}</FormErrorMessage>
       </FormControl>

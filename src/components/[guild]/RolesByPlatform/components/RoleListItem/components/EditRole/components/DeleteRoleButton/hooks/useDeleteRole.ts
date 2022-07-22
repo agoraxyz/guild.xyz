@@ -32,10 +32,11 @@ const useDeleteRole = (roleId: number) => {
         status: "success",
       })
 
-      mutate([`/guild/${guild?.urlName}`, undefined])
+      mutate([`/guild/details/${guild?.urlName}`, { method: "POST", body: {} }])
       matchMutate(/^\/guild\?order/)
     },
     onError: (error) => showErrorToast(error),
+    forcePrompt: true,
   })
 }
 

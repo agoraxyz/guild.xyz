@@ -92,7 +92,7 @@ const SetupBot = (): JSX.Element => {
     () => {
       triggerConfetti()
       // Mutating the guild data, so we get back the correct "activated" status for the POAPs
-      mutate([`/guild/${urlName}`, undefined])
+      mutate([`/guild/details/${urlName}`, { method: "POST", body: {} }])
     }
   )
 

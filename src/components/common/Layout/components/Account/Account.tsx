@@ -37,7 +37,7 @@ const Account = (): JSX.Element => {
     onOpen: onNetworkModalOpen,
     onClose: onNetworkModalClose,
   } = useDisclosure()
-  const { linkedAddressesCount } = useUser()
+  const { addresses } = useUser()
 
   if (typeof window === "undefined") {
     return (
@@ -58,6 +58,9 @@ const Account = (): JSX.Element => {
       </AccountButton>
     )
   }
+
+  const linkedAddressesCount = (addresses?.length ?? 1) - 1
+
   return (
     <Box bg="blackAlpha.400" borderRadius={"2xl"}>
       <ButtonGroup isAttached variant="ghost" alignItems="center">

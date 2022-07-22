@@ -1,10 +1,16 @@
 import { useRumAction, useRumError } from "@datadog/rum-react-integration"
 import { useWeb3React } from "@web3-react/core"
 import useGuild from "components/[guild]/hooks/useGuild"
+import useUser from "components/[guild]/hooks/useUser"
+import {
+  deleteKeyPairFromIdb,
+  getKeyPairFromIdb,
+  setKeyPairToIdb,
+} from "hooks/useKeyPair"
 import { useSubmitWithSign, WithValidation } from "hooks/useSubmit"
 import { mutate } from "swr"
-import { PlatformName } from "types"
-import fetcher from "utils/fetcher"
+import { PlatformName, User } from "types"
+import fetcher, { useFetcherWithSign } from "utils/fetcher"
 
 type PlatformResult = {
   platformId: number
@@ -40,6 +46,8 @@ const useJoinPlatform = (
   const addDatadogError = useRumError()
 
   const guild = useGuild()
+  const user = useUser()
+  const fetcherWithSign = useFetcherWithSign()
 
   const submit = ({
     data,
@@ -68,7 +76,21 @@ const useJoinPlatform = (
       addDatadogAction(`Successfully joined a guild`)
       if (platform?.length > 0)
         addDatadogAction(`Successfully joined a guild [${platform}]`)
-      mutate(`/user/${account}`)
+      ;(async () => {
+        const [prevKeys, newUser] = await Promise.all([
+          getKeyPairFromIdb(user?.id),
+          fetcherWithSign(`/user/details/${account}`, {
+            method: "POST",
+            body: {},
+          }) as Promise<User>,
+        ])
+
+        if (user?.id === newUser?.id || !prevKeys) return
+
+        await setKeyPairToIdb(newUser?.id, prevKeys)
+        await mutate([`/user/details/${account}`, { method: "POST", body: {} }])
+        await deleteKeyPairFromIdb(user?.id)
+      })()
     },
     onError: (err) => {
       addDatadogError(`Guild join error`, { error: err }, "custom")

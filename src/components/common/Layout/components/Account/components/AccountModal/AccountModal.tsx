@@ -17,26 +17,18 @@ import { CoinbaseWallet } from "@web3-react/coinbase-wallet"
 import { useWeb3React } from "@web3-react/core"
 import { MetaMask } from "@web3-react/metamask"
 import { WalletConnect } from "@web3-react/walletconnect"
-import Button from "components/common/Button"
 import CopyableAddress from "components/common/CopyableAddress"
 import GuildAvatar from "components/common/GuildAvatar"
 import { Modal } from "components/common/Modal"
 import useUser from "components/[guild]/hooks/useUser"
+import { deleteKeyPairFromIdb } from "hooks/useKeyPair"
 import { SignOut } from "phosphor-react"
-import { useContext } from "react"
-import { Web3Connection } from "../../../../../../_app/Web3ConnectionManager"
 import AccountConnections from "./components/AccountConnections"
 
 const AccountModal = ({ isOpen, onClose }) => {
   const { account, connector } = useWeb3React()
-  const { openWalletSelectorModal } = useContext(Web3Connection)
-  const { isLoading, platformUsers, addresses } = useUser()
+  const { isLoading, platformUsers, addresses, id } = useUser()
   const modalFooterBg = useColorModeValue("gray.100", "gray.800")
-
-  const handleWalletProviderSwitch = () => {
-    openWalletSelectorModal()
-    onClose()
-  }
 
   const connectorName = (c) =>
     c instanceof MetaMask
@@ -57,6 +49,8 @@ const AccountModal = ({ isOpen, onClose }) => {
     keysToRemove.forEach((key) => {
       window.localStorage.removeItem(key)
     })
+
+    deleteKeyPairFromIdb(id).catch(() => {})
   }
 
   return (
@@ -80,13 +74,6 @@ const AccountModal = ({ isOpen, onClose }) => {
               {`Connected with ${connectorName(connector)}`}
             </Text>
             <HStack>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleWalletProviderSwitch}
-              >
-                Switch
-              </Button>
               <Tooltip label="Disconnect">
                 <IconButton
                   size="sm"

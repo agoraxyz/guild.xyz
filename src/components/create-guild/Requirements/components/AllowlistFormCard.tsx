@@ -19,14 +19,12 @@ import {
 import Button from "components/common/Button"
 import FormErrorMessage from "components/common/FormErrorMessage"
 import { Modal } from "components/common/Modal"
-import useGuild from "components/[guild]/hooks/useGuild"
 import { domAnimation, LazyMotion, m } from "framer-motion"
 import useDropzone from "hooks/useDropzone"
 import { Check, File, TrashSimple } from "phosphor-react"
 import { useEffect, useState } from "react"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 import { GuildFormType, Requirement } from "types"
-import mapRequirements from "utils/mapRequirements"
 
 type Props = {
   index: number
@@ -48,46 +46,12 @@ const AllowlistFormCard = ({ index }: Props): JSX.Element => {
 
   const [latestValue, setLatestValue] = useState(null)
   const value = useWatch({ name: `requirements.${index}.data.addresses` })
-  const requirementId = useWatch({ name: `requirements.${index}.id` })
-  const roleId = useWatch({ name: `roleId` })
   const isHidden = useWatch({ name: `requirements.${index}.data.hideAllowlist` })
-  const [isEditing] = useState(typeof isHidden === "boolean")
-  const [isHiddenInitial] = useState(isHidden)
-  const { fetchAsOwner, fetchedAsOwner, roles, signLoadingText } = useGuild()
-  const [openOnFetch, setOpenOnFetch] = useState<boolean>(false)
 
   const openModal = () => {
     setLatestValue(value)
     onOpen()
   }
-
-  useEffect(() => {
-    if (!fetchedAsOwner) return
-    const role = roles?.find(({ id }) => id === roleId)
-    if (!role) return
-    const newRequirement = role.requirements?.find(({ id }) => id === requirementId)
-    if (newRequirement?.data?.hideAllowlist) {
-      const newMappedRequirement = mapRequirements([newRequirement])[0]
-      setValue(
-        `requirements.${index}.data.addresses`,
-        newMappedRequirement.data.addresses
-      )
-      if (openOnFetch) {
-        setOpenOnFetch(false)
-        setLatestValue(newMappedRequirement.data?.addresses ?? [])
-        onOpen()
-      }
-    }
-  }, [
-    requirementId,
-    index,
-    openOnFetch,
-    fetchedAsOwner,
-    roles,
-    roleId,
-    setValue,
-    onOpen,
-  ])
 
   // Open modal when adding a new AllowlistFormCard
   useEffect(() => {
@@ -183,14 +147,11 @@ const AllowlistFormCard = ({ index }: Props): JSX.Element => {
   return (
     <>
       <Text fontWeight="medium">
-        {isHiddenInitial && !fetchedAsOwner
-          ? "Private allowlist"
-          : `${value?.filter?.(validAddress)?.length ?? 0} allowlisted address${
-              value?.length > 1 ? "es" : ""
-            }`}
+        {value?.filter?.(validAddress)?.length ?? 0} allowlisted address
+        {value?.length > 1 ? "es" : ""}
       </Text>
       <Divider />
-      <FormControl pb={3} isDisabled={isHiddenInitial && !fetchedAsOwner}>
+      <FormControl pb={3}>
         <Checkbox
           fontWeight="medium"
           {...register(`requirements.${index}.data.hideAllowlist`)}
@@ -200,26 +161,7 @@ const AllowlistFormCard = ({ index }: Props): JSX.Element => {
         </Checkbox>
       </FormControl>
 
-      <Button
-        w="full"
-        flexShrink="0"
-        mt="auto !important"
-        isLoading={
-          /*isHiddenInitial &&
-          isEditing &&
-          !fetchedAsOwner &&
-          (isSigning || isLoading) && */ openOnFetch
-        }
-        loadingText={signLoadingText || "Loading"}
-        onClick={
-          !isHiddenInitial || !isEditing || fetchedAsOwner
-            ? openModal
-            : () => {
-                setOpenOnFetch(true)
-                fetchAsOwner()
-              }
-        }
-      >
+      <Button w="full" flexShrink="0" mt="auto !important" onClick={openModal}>
         Edit list
       </Button>
 

@@ -33,7 +33,7 @@ const useUploadMintLinks = () => {
       })
 
       // Mutating the guild data & mint links, so we get back the correct "activated" status for the POAPs
-      mutate([`/guild/${urlName}`, undefined])
+      mutate([`/guild/details/${urlName}`, { method: "POST", body: {} }])
       mutatePoapLinks()
     },
   })
